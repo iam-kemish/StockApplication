@@ -27,7 +27,7 @@ namespace StockApplication.Repositary.StockRepositary
 
         public async Task<IEnumerable<Stock>> GetAllStocks(Expression<Func<Stock, bool>>? filter = null)
         {
-            var query = _Db.Stocks.Include(p => p.Comments).AsQueryable();
+            var query = _Db.Stocks.Include(p => p.Comments).AsNoTracking().AsQueryable();
             if (filter != null) 
             {
                 query = query.Where(filter);
@@ -39,7 +39,7 @@ namespace StockApplication.Repositary.StockRepositary
 
         public Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null)
         {
-            var query = _Db.Stocks.Include(p => p.Comments).AsQueryable();
+            var query = _Db.Stocks.Include(p => p.Comments).AsNoTracking().AsQueryable();
             if (filter != null)
             {
                 query = query.Where(filter);

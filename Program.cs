@@ -1,35 +1,45 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Scalar.AspNetCore;
 using StockApplication.Database;
 using StockApplication.Mapper;
 using StockApplication.Repositary.StockRepositary;
+using StockApplication.Services.StockServices;
+using StockApplication.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Controllers + API behavior
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+// FluentValidation - assembly scan (this is perfect)
+builder.Services.AddValidatorsFromAssemblyContaining<StockCreateDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<StockUpdateDtoValidator>();
+
+// OpenAPI / Scalar (good, but consider builder.Services.AddEndpointsApiExplorer() if using minimal APIs later)
 builder.Services.AddOpenApi();
+
+// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// AutoMapper
 builder.Services.AddAutoMapper(typeof(MapConfig));
 
-builder.Services.AddScoped<IStock,StockRepo>();
+// Your services
+builder.Services.AddScoped<IStock, StockRepo>();
+builder.Services.AddScoped<IStockService, StockClass>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapScalarApiReference();
-    app.MapOpenApi();
+    app.MapOpenApi();           // usually before Scalar
+    app.MapScalarApiReference(); // nice for dev docs
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();

@@ -12,8 +12,8 @@ using StockApplication.Database;
 namespace StockApplication.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260204142219_Secondry")]
-    partial class Secondry
+    [Migration("20260319081639_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -8,6 +8,7 @@ namespace StockApplication.Mapper
     {
         public MapConfig() { 
           CreateMap<Stock,StockDTO>().ReverseMap();
+            CreateMap<Stock, StockCreateDTO>().ReverseMap();
         }
     }
 }

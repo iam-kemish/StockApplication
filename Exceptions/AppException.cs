@@ -44,17 +44,17 @@ namespace StockApplication.Exceptions
     }
 
     // Validation errors
-    public sealed class ValidationException : AppException
+    public sealed class AppValidationException : AppException
     {
         public IDictionary<string, string[]> Errors { get; }
 
-        public ValidationException(IDictionary<string, string[]> errors)
+        public AppValidationException(IDictionary<string, string[]> errors)
             : base("One or more validation errors occurred.", HttpStatusCode.BadRequest)
         {
             Errors = errors;
         }
 
-        public ValidationException(string field, string error)
+        public AppValidationException(string field, string error)
             : base("One or more validation errors occurred.", HttpStatusCode.BadRequest)
         {
             Errors = new Dictionary<string, string[]>

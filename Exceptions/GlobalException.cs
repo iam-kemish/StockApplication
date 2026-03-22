@@ -36,7 +36,7 @@ public class GlobalException
 
         switch (exception)
         {
-            case ValidationException validationEx:
+            case AppValidationException validationEx:
                 response.statusCode = HttpStatusCode.BadRequest;
                 response.Message = validationEx.Message;
                 response.Errors = validationEx.Errors;

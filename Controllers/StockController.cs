@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using StockApplication.Exceptions;
 using StockApplication.Models;
 using StockApplication.Models.DTOs;
 using StockApplication.Services.StockServices;
@@ -11,33 +12,115 @@ namespace StockApplication.Controllers
     [ApiController]
     public class StockController : ControllerBase
     {
-        private readonly IStockService _IStockService;
-        private readonly IValidator<StockCreateDTO> _StockCreate;
-        public StockController(IStockService stockService, IValidator<StockCreateDTO> StockCreate)
+        private readonly IStockService _stockService;
+        private readonly IValidator<StockCreateDTO> _createValidator;
+        private readonly IValidator<StockUpdateDTO> _updateValidator;
+
+        public StockController(
+            IStockService stockService,
+            IValidator<StockCreateDTO> createValidator,
+            IValidator<StockUpdateDTO> updateValidator)
         {
-            _IStockService = stockService;
-            _StockCreate = StockCreate;
+            _stockService = stockService;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] StockCreateDTO dto)
         {
-            var ValidationResult = await _StockCreate.ValidateAsync(dto);
+            var validationResult = await _createValidator.ValidateAsync(dto);
 
-            if (!ValidationResult.IsValid)
+            if (!validationResult.IsValid)
             {
-                // Nice structured response (compatible with ProblemDetails)
-                var firstError = ValidationResult.Errors.GroupBy(x => x.PropertyName)
-            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-             
+                var errors = validationResult.Errors
+                    .GroupBy(x => x.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                throw new AppValidationException(errors);
             }
 
-            var stock = await _IStockService.AddStock(dto);
-            return Created(string.Empty,new APIResponse
+            var createdStock = await _stockService.AddStock(dto);
+
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = createdStock.Id },   // assuming StockDTO has Id property
+                new APIResponse
+                {
+                    IsSuccess = true,
+                    statusCode = HttpStatusCode.Created,
+                    Message = "Stock created successfully",
+                    Result = createdStock
+                }
+            );
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var stock = await _stockService.GetStockById(id);
+            return Ok(new APIResponse
             {
-                Result = stock,
-                statusCode = System.Net.HttpStatusCode.Created
+                IsSuccess = true,
+                statusCode = HttpStatusCode.OK,
+                Result = stock
             });
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update( [FromBody] StockUpdateDTO dto)
+        {
+            // Enforce consistency between route and body
+           
+            var validationResult = await _updateValidator.ValidateAsync(dto);
+
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors
+                    .GroupBy(x => x.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                throw new AppValidationException(errors);
+            }
+
+            var updatedStock = await _stockService.UpdateStock(dto);
+
+            return Ok(new APIResponse
+            {
+                IsSuccess = true,
+                statusCode = HttpStatusCode.OK,
+                Message = "Stock updated successfully",
+                Result = updatedStock
+            });
+        }
+
+      
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var stocks = await _stockService.GetAllStocks();
+
+            return Ok(new APIResponse
+            {
+                IsSuccess = true,
+                statusCode = HttpStatusCode.OK,
+                Result = stocks
+            });
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _stockService.DeleteStock(id);
+
+            return NoContent(); 
+        }
     }
-    
 }

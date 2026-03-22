@@ -23,7 +23,17 @@ namespace StockApplication.Services.StockServices
             if (await _IStock.GetStock(u => u.CompanyName.ToLower() == stock.CompanyName.ToLower()) != null)
             {
                 throw new ConflictException("This company name already exists.");
-                // ↑ good — already correct
+               
+            }
+            if (await _IStock.GetStock(u => u.Industry.ToLower() == stock.Industry.ToLower()) != null)
+            {
+                throw new ConflictException("This Industry name already exists.");
+               
+            }
+            if (await _IStock.GetStock(u => u.Symbol.ToLower() == stock.Symbol.ToLower()) != null)
+            {
+                throw new ConflictException("This Symbol name already exists.");
+                
             }
 
             var createdStock = _IMapper.Map<Stock>(stock);
@@ -77,6 +87,7 @@ namespace StockApplication.Services.StockServices
             existingStock.LastDiv = stock.LastDiv;
             existingStock.Industry = stock.Industry;
             existingStock.CompanyName = stock.CompanyName;
+            existingStock.Symbol = stock.Symbol;
 
             await _IStock.UpdateStock(existingStock);
 

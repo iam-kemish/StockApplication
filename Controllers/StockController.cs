@@ -26,15 +26,9 @@ namespace StockApplication.Controllers
             if (!ValidationResult.IsValid)
             {
                 // Nice structured response (compatible with ProblemDetails)
-                var firstError = ValidationResult.Errors.FirstOrDefault()?.ErrorMessage
-                          ?? "Validation failed";
-                return BadRequest(new APIResponse
-                {
-                    IsSuccess = false,
-                    statusCode = HttpStatusCode.BadRequest,
-                    Errors = firstError,   
-                    Result = dto
-                });
+                var firstError = ValidationResult.Errors.GroupBy(x => x.PropertyName)
+            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+             
             }
 
             var stock = await _IStockService.AddStock(dto);

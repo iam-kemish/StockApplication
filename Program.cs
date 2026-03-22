@@ -2,12 +2,14 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using StockApplication.Database;
+using StockApplication.Exceptions;
 using StockApplication.Mapper;
 using StockApplication.Repositary.StockRepositary;
 using StockApplication.Services.StockServices;
 using StockApplication.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Controllers + API behavior
 builder.Services.AddControllers();
@@ -35,6 +37,7 @@ var app = builder.Build();
 // Pipeline
 if (app.Environment.IsDevelopment())
 {
+    app.UseMiddleware<GlobalException>();
     app.MapOpenApi();           // usually before Scalar
     app.MapScalarApiReference(); // nice for dev docs
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using StockApplication.Exceptions;
 using StockApplication.Models;
 using StockApplication.Models.DTOs;
 using StockApplication.Repositary.StockRepositary;
@@ -17,65 +18,72 @@ namespace StockApplication.Services.StockServices
             _IMapper = mapper;
           
         }
-
         public async Task<StockDTO> AddStock(StockCreateDTO stock)
         {
-           
-          
-            var createdStock = _IMapper.Map<Stock>(stock);
+            if (await _IStock.GetStock(u => u.CompanyName.ToLower() == stock.CompanyName.ToLower()) != null)
+            {
+                throw new ConflictException("This company name already exists.");
+                // ↑ good — already correct
+            }
 
-                await  _IStock.AddStock(createdStock);
+            var createdStock = _IMapper.Map<Stock>(stock);
+            await _IStock.AddStock(createdStock);
 
             return _IMapper.Map<StockDTO>(createdStock);
         }
 
         public async Task DeleteStock(int id)
         {
-            var stock = await _IStock.GetStock(u=>u.Id == id);
-            if(stock == null)
+            var stock = await _IStock.GetStock(u => u.Id == id);
+            if (stock == null)
             {
-                throw new Exception($"Stock {id} not found");
+                throw new NotFoundException("Stock", id);
+                // Better than plain Exception
             }
-          await _IStock.DeleteStock(stock);
-         
+            await _IStock.DeleteStock(stock);
         }
 
         public async Task<IEnumerable<StockDTO>> GetAllStocks()
         {
             var stocks = await _IStock.GetAllStocks();
-            if(stocks == null)
-            {
-                throw new Exception($"{nameof(GetAllStocks)}");
-            }
-            return  _IMapper.Map<IEnumerable<StockDTO>>(stocks);
-
+            // Usually you don't throw when list is empty — just return empty list
+            // So better to remove this check completely
+            return _IMapper.Map<IEnumerable<StockDTO>>(stocks);
         }
 
         public async Task<StockDTO?> GetStockById(int id)
         {
             var stock = await _IStock.GetStock(u => u.Id == id);
-            if(stock == null)
+            if (stock == null)
             {
-                throw new Exception($"Stock {id} not found");
+                throw new NotFoundException("Stock", id);
             }
-            return _IMapper.Map<StockDTO?>(stock);
+            return _IMapper.Map<StockDTO>(stock);
         }
 
         public async Task<StockDTO> UpdateStock(StockUpdateDTO stock)
         {
-            var exisitingStock = await _IStock.GetStock(u=>u.Id ==stock.Id);
-            if (exisitingStock == null) {
-
-                throw new Exception("The stock or item couldnt be found");
+            var existingStock = await _IStock.GetStock(u => u.Id == stock.Id);
+            if (existingStock == null)
+            {
+                throw new NotFoundException("Stock", stock.Id);
             }
-            exisitingStock.MarketCap = stock.MarketCap;
-            exisitingStock.Purchase = stock.Purchase;
-            exisitingStock.LastDiv = stock.LastDiv;
-            exisitingStock.Industry = stock.Industry;
-            exisitingStock.CompanyName = stock.CompanyName;
-            await _IStock.UpdateStock(exisitingStock);
-            var requiredStock = _IMapper.Map<StockDTO>(exisitingStock);
-            return requiredStock;
+
+            // You can also do partial update with AutoMapper if you want:
+            // _IMapper.Map(stock, existingStock);
+
+            existingStock.MarketCap = stock.MarketCap;
+            existingStock.Purchase = stock.Purchase;
+            existingStock.LastDiv = stock.LastDiv;
+            existingStock.Industry = stock.Industry;
+            existingStock.CompanyName = stock.CompanyName;
+
+            await _IStock.UpdateStock(existingStock);
+
+            return _IMapper.Map<StockDTO>(existingStock);
         }
+
+
+
     }
-}
+    }

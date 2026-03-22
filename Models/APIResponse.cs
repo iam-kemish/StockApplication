@@ -1,14 +1,19 @@
 ﻿using System.Net;
+using System.Text.Json.Serialization;
 
 namespace StockApplication.Models
 {
     public class APIResponse
     {
-        public HttpStatusCode statusCode { get; set; }
         public bool IsSuccess { get; set; } = true;
-        public string? Errors { get; set; }
-        public object Result { get; set; } = new object();
 
-    
+
+        [JsonPropertyName("statusCode")]
+        public HttpStatusCode statusCode { get; set; }
+        public object Result { get; set; }
+        public string? Message { get; set; }   
+        public object? Errors { get; set; }
+
+
     }
 }

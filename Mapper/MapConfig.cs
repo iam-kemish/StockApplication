@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using StockApplication.Models;
-using StockApplication.Models.DTOs;
+using StockApplicationApi.Models;
+using StockApplicationApi.Models.DTOs;
 
-namespace StockApplication.Mapper
+namespace StockApplicationApi.Mapper
 {
     public class MapConfig: Profile
     {

@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using StockApplication.Database;
-using StockApplication.Models;
+using StockApplicationApi.Database;
+using StockApplicationApi.Models;
 
-namespace StockApplication.Repositary.StockRepositary
+namespace StockApplicationApi.Repositary.StockRepositary
 {
     public class StockRepo : IStock
     {

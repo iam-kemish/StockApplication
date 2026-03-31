@@ -1,4 +1,4 @@
-﻿namespace StockApplication.Models
+﻿namespace StockApplicationApi.Models
 {
     public class Comment
     {

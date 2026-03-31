@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using StockApplication.Exceptions;
-using StockApplication.Models;
-using StockApplication.Models.DTOs;
-using StockApplication.Repositary.StockRepositary;
+using StockApplicationApi.Exceptions;
+using StockApplicationApi.Models;
+using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Repositary.StockRepositary;
 
-namespace StockApplication.Services.StockServices
+namespace StockApplicationApi.Services.StockServices
 {
     public class StockClass : IStockService
     {
@@ -22,8 +22,8 @@ namespace StockApplication.Services.StockServices
         {
             if (await _IStock.GetStock(u => u.CompanyName.ToLower() == stock.CompanyName.ToLower()) != null)
             {
-                throw new ConflictException("This company name already exists.");
-               
+                throw new ConflictException("This Company name already exists.");
+
             }
             if (await _IStock.GetStock(u => u.Industry.ToLower() == stock.Industry.ToLower()) != null)
             {
@@ -33,7 +33,7 @@ namespace StockApplication.Services.StockServices
             if (await _IStock.GetStock(u => u.Symbol.ToLower() == stock.Symbol.ToLower()) != null)
             {
                 throw new ConflictException("This Symbol name already exists.");
-                
+
             }
 
             var createdStock = _IMapper.Map<Stock>(stock);
@@ -61,7 +61,7 @@ namespace StockApplication.Services.StockServices
             return _IMapper.Map<IEnumerable<StockDTO>>(stocks);
         }
 
-        public async Task<StockDTO?> GetStockById(int id)
+        public async Task<StockDTO> GetStockById(int id)
         {
             var stock = await _IStock.GetStock(u => u.Id == id);
             if (stock == null)
@@ -79,9 +79,7 @@ namespace StockApplication.Services.StockServices
                 throw new NotFoundException("Stock", stock.Id);
             }
 
-            // You can also do partial update with AutoMapper if you want:
-            // _IMapper.Map(stock, existingStock);
-
+           
             existingStock.MarketCap = stock.MarketCap;
             existingStock.Purchase = stock.Purchase;
             existingStock.LastDiv = stock.LastDiv;

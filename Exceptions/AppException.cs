@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace StockApplication.Exceptions
+namespace StockApplicationApi.Exceptions
 {
     // Base exception
     public class AppException : Exception

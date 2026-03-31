@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
-using StockApplication.Models.DTOs;
+using StockApplicationApi.Models.DTOs;
 
-namespace StockApplication.Validators
+namespace StockApplicationApi.Validators
 {
     public class StockCreateDtoValidator: AbstractValidator<StockCreateDTO>
     {
@@ -20,9 +20,7 @@ namespace StockApplication.Validators
                 .NotEmpty().WithMessage("Company name is required")
                 .MaximumLength(100);
 
-            RuleFor(x => x.LastDiv)
-                .GreaterThanOrEqualTo(5).WithMessage("Last dividend should be greater than of equal to 5");
-
+         
 
             RuleFor(x => x.MarketCap)
                 .GreaterThanOrEqualTo(1000).WithMessage("Market cap should be greater than or equal to 1000");

@@ -1,5 +1,5 @@
-﻿using StockApplication.Exceptions;
-using StockApplication.Models;
+﻿using StockApplicationApi.Exceptions;
+using StockApplicationApi.Models;
 using System.Net;
 using System.Text.Json;
 

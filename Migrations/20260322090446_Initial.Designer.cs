@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using StockApplication.Database;
+using StockApplicationApi.Database;
 
 #nullable disable
 
-namespace StockApplication.Migrations
+namespace StockApplicationApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260319081639_Initial")]
+    [Migration("20260322090446_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace StockApplication.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("StockApplication.Models.Comment", b =>
+            modelBuilder.Entity("StockApplicationApi.Models.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,7 +54,7 @@ namespace StockApplication.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("StockApplication.Models.Stock", b =>
+            modelBuilder.Entity("StockApplicationApi.Models.Stock", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -150,16 +150,16 @@ namespace StockApplication.Migrations
                         });
                 });
 
-            modelBuilder.Entity("StockApplication.Models.Comment", b =>
+            modelBuilder.Entity("StockApplicationApi.Models.Comment", b =>
                 {
-                    b.HasOne("StockApplication.Models.Stock", "Stocks")
+                    b.HasOne("StockApplicationApi.Models.Stock", "Stocks")
                         .WithMany("Comments")
                         .HasForeignKey("StockId");
 
                     b.Navigation("Stocks");
                 });
 
-            modelBuilder.Entity("StockApplication.Models.Stock", b =>
+            modelBuilder.Entity("StockApplicationApi.Models.Stock", b =>
                 {
                     b.Navigation("Comments");
                 });

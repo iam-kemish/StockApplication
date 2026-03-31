@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace StockApplication.Models
+namespace StockApplicationApi.Models
 {
     public class Stock
     {

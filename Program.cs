@@ -1,12 +1,12 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using StockApplication.Database;
-using StockApplication.Exceptions;
-using StockApplication.Mapper;
-using StockApplication.Repositary.StockRepositary;
-using StockApplication.Services.StockServices;
-using StockApplication.Validators;
+using StockApplicationApi.Database;
+using StockApplicationApi.Exceptions;
+using StockApplicationApi.Mapper;
+using StockApplicationApi.Repositary.StockRepositary;
+using StockApplicationApi.Services.StockServices;
+using StockApplicationApi.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,12 +1,12 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using StockApplication.Exceptions;
-using StockApplication.Models;
-using StockApplication.Models.DTOs;
-using StockApplication.Services.StockServices;
+using StockApplicationApi.Exceptions;
+using StockApplicationApi.Models;
+using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Services.StockServices;
 using System.Net;
 
-namespace StockApplication.Controllers
+namespace StockApplicationApi.Controllers
 {
     [Route("api/stock")]
     [ApiController]
@@ -47,7 +47,7 @@ namespace StockApplication.Controllers
 
             return CreatedAtAction(
                 nameof(GetById),
-                new { id = createdStock.Id },   // assuming StockDTO has Id property
+                new { id = createdStock.Id },   
                 new APIResponse
                 {
                     IsSuccess = true,

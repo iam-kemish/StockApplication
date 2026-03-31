@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Hosting;
-using StockApplication.Models;
+using StockApplicationApi.Models;
 using System.Linq.Expressions;
 
-namespace StockApplication.Repositary.StockRepositary
+namespace StockApplicationApi.Repositary.StockRepositary
 {
     public interface IStock
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using StockApplication.Models;
+using StockApplicationApi.Models;
 
-namespace StockApplication.Database
+namespace StockApplicationApi.Database
 {
     public class AppDbContext : DbContext
     {

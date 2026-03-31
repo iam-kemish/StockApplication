@@ -1,4 +1,4 @@
-﻿namespace StockApplication.Models.DTOs
+﻿namespace StockApplicationApi.Models.DTOs
 {
     public class StockUpdateDTO
     {

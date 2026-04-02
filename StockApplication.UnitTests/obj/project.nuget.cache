@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "EC1gj1jsDy4=",
-  "success": false,
+  "dgSpecHash": "zt7qhCsvfrQ=",
+  "success": true,
   "projectFilePath": "C:\\Users\\Kemis\\Source\\Repos\\StockApplication\\StockApplication.UnitTests\\StockApplication.UnitTests.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Kemis\\.nuget\\packages\\automapper\\14.0.0\\automapper.14.0.0.nupkg.sha512",
@@ -84,17 +84,5 @@
     "C:\\Users\\Kemis\\.nuget\\packages\\xunit.extensibility.execution\\2.9.2\\xunit.extensibility.execution.2.9.2.nupkg.sha512",
     "C:\\Users\\Kemis\\.nuget\\packages\\xunit.runner.visualstudio\\2.8.2\\xunit.runner.visualstudio.2.8.2.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1104",
-      "level": "Error",
-      "message": "Unable to find project 'C:\\Users\\Kemis\\Source\\Repos\\StockApplication\\StockApplication\\StockApplicationApi.csproj'. Check that the project reference is valid and that the project file exists.",
-      "projectPath": "C:\\Users\\Kemis\\Source\\Repos\\StockApplication\\StockApplication.UnitTests\\StockApplication.UnitTests.csproj",
-      "filePath": "C:\\Users\\Kemis\\Source\\Repos\\StockApplication\\StockApplication.UnitTests\\StockApplication.UnitTests.csproj",
-      "libraryId": "C:\\Users\\Kemis\\Source\\Repos\\StockApplication\\StockApplication\\StockApplicationApi.csproj",
-      "targetGraphs": [
-        "net9.0"
-      ]
-    }
-  ]
+  "logs": []
 }

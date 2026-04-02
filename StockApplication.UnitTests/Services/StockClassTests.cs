@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
@@ -22,7 +23,7 @@ namespace StockApplicationApi.UnitTests.Services
             _service = new StockClass(_mockRepo.Object, _mockMapper.Object);
         }
 
-     
+
 
         // TEST 1 — company name duplicate → throws
         [Fact]
@@ -34,13 +35,13 @@ namespace StockApplicationApi.UnitTests.Services
                 CompanyName = "Apple",
                 Industry = "Tech",
                 Symbol = "AAPL",
-               
+
             };
 
             _mockRepo.SetupSequence(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
-                     .ReturnsAsync(new Stock())    
-                     .ReturnsAsync((Stock)null)    
-                     .ReturnsAsync((Stock)null); 
+                     .ReturnsAsync(new Stock())
+                     .ReturnsAsync((Stock)null)
+                     .ReturnsAsync((Stock)null);
 
             // ACT
             var ex = await Assert.ThrowsAsync<ConflictException>(
@@ -56,7 +57,7 @@ namespace StockApplicationApi.UnitTests.Services
         [Fact]
         public async Task AddStock_IndustryAlreadyExists_ThrowsConflictException()
         {
-           
+
             var createDTO = new StockCreateDTO
             {
                 CompanyName = "Apple",
@@ -68,16 +69,16 @@ namespace StockApplicationApi.UnitTests.Services
             };
 
             _mockRepo.SetupSequence(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
-                     .ReturnsAsync((Stock)null)    
-                     .ReturnsAsync(new Stock())    
-                     .ReturnsAsync((Stock)null); 
+                     .ReturnsAsync((Stock)null)
+                     .ReturnsAsync(new Stock())
+                     .ReturnsAsync((Stock)null);
 
-          
+
             var ex = await Assert.ThrowsAsync<ConflictException>(
                 () => _service.AddStock(createDTO)
             );
 
-          
+
             Assert.Equal("This Industry name already exists.", ex.Message);
 
         }
@@ -86,7 +87,7 @@ namespace StockApplicationApi.UnitTests.Services
         [Fact]
         public async Task AddStock_SymbolAlreadyExists_ThrowsConflictException()
         {
-            
+
             var createDTO = new StockCreateDTO
             {
                 CompanyName = "Apple",
@@ -102,12 +103,12 @@ namespace StockApplicationApi.UnitTests.Services
                      .ReturnsAsync((Stock)null)    // industry → no duplicate
                      .ReturnsAsync(new Stock());   // symbol → duplicate found
 
-          
+
             var ex = await Assert.ThrowsAsync<ConflictException>(
                 () => _service.AddStock(createDTO)
             );
 
-           
+
             Assert.Equal("This Symbol name already exists.", ex.Message);
 
         }
@@ -156,11 +157,11 @@ namespace StockApplicationApi.UnitTests.Services
                      .ReturnsAsync((Stock)null)    // industry → no duplicate
                      .ReturnsAsync((Stock)null);   // symbol → no duplicate
 
-          
+
             _mockMapper.Setup(m => m.Map<Stock>(createDTO))
                        .Returns(stockEntity);
 
-          
+
             _mockMapper.Setup(m => m.Map<StockDTO>(stockEntity))
                        .Returns(stockDTO);
 
@@ -196,7 +197,7 @@ namespace StockApplicationApi.UnitTests.Services
         [Fact]
         public async Task DeleteStock_StockNotFound_ThrowsNotFoundException()
         {
-          
+
             int stockId = 1;
 
             // mock repo returns null → stock not found in DB
@@ -244,11 +245,80 @@ namespace StockApplicationApi.UnitTests.Services
             // ACT
             await _service.DeleteStock(stockId);
 
-           
+
             _mockRepo.Verify(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()), Times.Once);
 
             // prove delete was actually called once
             _mockRepo.Verify(r => r.DeleteStock(stockEntity), Times.Once);
+        }
+        [Fact]
+        public async Task UpdateStock_StockNotFound_ThrowsNotFoundException()
+        {
+            StockUpdateDTO stockUpdateDTO = new() { Id = 1 };
+
+
+            // mock repo returns null → stock not found in DB
+            _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
+                     .ReturnsAsync((Stock)null);
+
+            // ACT
+            var ex = await Assert.ThrowsAsync<NotFoundException>(
+                () => _service.UpdateStock(stockUpdateDTO)
+            );
+
+            // ASSERT
+            Assert.Equal("Stock with identifier '1' was not found.", ex.Message);
+
+            // prove update was never called because stock was not found
+            _mockRepo.Verify(r => r.UpdateStock(It.IsAny<Stock>()), Times.Never);
+
+        }
+        public async Task UpdateStock_ValidStock_FieldsAreCorrectlyMapped()
+        {
+            StockUpdateDTO stockUpdateDTO = new()
+            {
+                Id = 1,
+                CompanyName = "Tesla Updated",
+                Symbol = "TSLA",
+                MarketCap = 9000,
+                Purchase = 200,
+                LastDiv = 3.0m,
+                Industry = "Automotive"
+            };
+            Stock existingStock = new()
+            {
+                Id = 1,
+                CompanyName = "Tesla",
+                Symbol = "TSLA",
+                MarketCap = 7000,
+                Purchase = 180,
+                LastDiv = 2.0m,
+                Industry = "Auto"
+            };
+            Stock result = null;
+            _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
+             .ReturnsAsync(existingStock);
+
+            _mockRepo.Setup(r => r.UpdateStock(It.IsAny<Stock>()))
+                    .Returns(Task.CompletedTask);
+            _mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
+              .Returns(new StockDTO());
+            await _service.UpdateStock(stockUpdateDTO);
+
+            Assert.NotNull(result);
+            Assert.NotNull(result);
+            Assert.Equal("Tesla Updated", result.CompanyName);
+            Assert.Equal(9000, result.MarketCap);
+            Assert.Equal(200, result.Purchase);
+            Assert.Equal(3.0m, result.LastDiv);
+            Assert.Equal("Automotive", result.Industry);
+
+            _mockRepo.Verify(r => r.UpdateStock(result), Times.Once);
+
+           
+            _mockMapper.Verify(m => m.Map<StockDTO>(existingStock), Times.Once);
+
+          
         }
     }
 }

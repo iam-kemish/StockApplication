@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using StockApplicationApi.Models;
-using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Models.DTOs.StockDTOs;
 
 namespace StockApplicationApi.Mapper
 {

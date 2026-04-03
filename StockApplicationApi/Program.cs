@@ -4,6 +4,7 @@ using Scalar.AspNetCore;
 using StockApplicationApi.Database;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Mapper;
+using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Validators;
@@ -31,7 +32,7 @@ builder.Services.AddAutoMapper(typeof(MapConfig));
 // Your services
 builder.Services.AddScoped<IStock, StockRepo>();
 builder.Services.AddScoped<IStockService, StockClass>();
-
+builder.Services.AddScoped<IComment, CommentClass>();
 var app = builder.Build();
 
 // Pipeline

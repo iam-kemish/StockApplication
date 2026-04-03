@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
-using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.StockServices;
 using System.Linq.Expressions;

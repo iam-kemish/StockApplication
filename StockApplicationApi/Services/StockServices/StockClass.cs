@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
-using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.StockRepositary;
 
 namespace StockApplicationApi.Services.StockServices

@@ -1,4 +1,4 @@
-﻿using StockApplicationApi.Models.DTOs;
+﻿using StockApplicationApi.Models.DTOs.StockDTOs;
 
 namespace StockApplicationApi.Services.StockServices
 {

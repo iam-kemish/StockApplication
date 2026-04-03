@@ -1,5 +1,7 @@
-﻿using StockApplicationApi.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using StockApplicationApi.Database;
 using StockApplicationApi.Models;
+using System.Linq.Expressions;
 
 namespace StockApplicationApi.Repositary.CommentRepositary
 {
@@ -14,6 +16,16 @@ namespace StockApplicationApi.Repositary.CommentRepositary
         {
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Comment>> GetAllComments(Expression<Func<Comment, bool>>? filter = null)
+        {
+            var query = _context.Comments.AsNoTracking().AsQueryable();
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            return await query.ToListAsync();
         }
     }
 }

@@ -3,12 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|c:\\users\\kemis\\source\\repos\\stockapplication\\stockapplicationapi\\services\\commentservices\\icommentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|solutionrelative:stockapplicationapi\\services\\commentservices\\icommentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|c:\\users\\kemis\\source\\repos\\stockapplication\\stockapplicationapi\\services\\commentservices\\commentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|solutionrelative:stockapplicationapi\\services\\commentservices\\commentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|c:\\users\\kemis\\source\\repos\\stockapplication\\stockapplicationapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|solutionrelative:stockapplicationapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,32 +14,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "CommentService.cs",
-              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Services\\CommentServices\\CommentService.cs",
-              "RelativeDocumentMoniker": "StockApplicationApi\\Services\\CommentServices\\CommentService.cs",
-              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Services\\CommentServices\\CommentService.cs",
-              "RelativeToolTip": "StockApplicationApi\\Services\\CommentServices\\CommentService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-03T09:14:20.681Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ICommentService.cs",
-              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Services\\CommentServices\\ICommentService.cs",
-              "RelativeDocumentMoniker": "StockApplicationApi\\Services\\CommentServices\\ICommentService.cs",
-              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Services\\CommentServices\\ICommentService.cs",
-              "RelativeToolTip": "StockApplicationApi\\Services\\CommentServices\\ICommentService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Program.cs",
+              "RelativeDocumentMoniker": "StockApplicationApi\\Program.cs",
+              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Program.cs",
+              "RelativeToolTip": "StockApplicationApi\\Program.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAAACoAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-03T09:08:50.847Z",
+              "WhenOpened": "2026-04-03T11:17:18.371Z",
               "EditorCaption": ""
             }
           ]

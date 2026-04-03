@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 
-namespace StockApplicationApi.Validators
+namespace StockApplicationApi.Validators.Stocks
 {
     public class StockCreateDtoValidator: AbstractValidator<StockCreateDTO>
     {

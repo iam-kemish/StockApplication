@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using StockApplicationApi.Models;
+using StockApplicationApi.Models.DTOs.CommentDTOs;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 
 namespace StockApplicationApi.Mapper
@@ -9,6 +10,8 @@ namespace StockApplicationApi.Mapper
         public MapConfig() { 
           CreateMap<Stock,StockDTO>().ReverseMap();
             CreateMap<Stock, StockCreateDTO>().ReverseMap();
+            CreateMap<Comment,CommentDto>().ReverseMap();
+            CreateMap<Comment, CreateComment>().ReverseMap();
         }
     }
 }

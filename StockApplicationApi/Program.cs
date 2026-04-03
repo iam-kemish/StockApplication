@@ -6,8 +6,9 @@ using StockApplicationApi.Exceptions;
 using StockApplicationApi.Mapper;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
+using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Services.StockServices;
-using StockApplicationApi.Validators;
+using StockApplicationApi.Validators.Stocks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ builder.Services.AddAutoMapper(typeof(MapConfig));
 builder.Services.AddScoped<IStock, StockRepo>();
 builder.Services.AddScoped<IStockService, StockClass>();
 builder.Services.AddScoped<IComment, CommentClass>();
+builder.Services.AddScoped<ICommentService,CommentService>();
 var app = builder.Build();
 
 // Pipeline

@@ -5,6 +5,7 @@ namespace StockApplicationApi.Services.CommentServices
 {
     public interface ICommentService
     {
-        Task<StockDTO> AddComment(CreateComment comment);
+        Task<IEnumerable<CommentDto>> GetAllComments();
+        Task<CommentDto> AddComment(CreateComment comment);
     }
 }

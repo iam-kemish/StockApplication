@@ -12,8 +12,8 @@ using StockApplicationApi.Database;
 namespace StockApplicationApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260322090446_Initial")]
-    partial class Initial
+    [Migration("20260407100258_CommentSeeder")]
+    partial class CommentSeeder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,6 +52,104 @@ namespace StockApplicationApi.Migrations
                     b.HasIndex("StockId");
 
                     b.ToTable("Comments");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Content = "Apple has one of the strongest ecosystems with loyal customers.",
+                            CreatedOn = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 1,
+                            Title = "Strong Ecosystem"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Content = "Consistent performance and reliable dividends.",
+                            CreatedOn = new DateTime(2024, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 1,
+                            Title = "Stable Growth"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Content = "Azure is driving massive growth for Microsoft.",
+                            CreatedOn = new DateTime(2024, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 2,
+                            Title = "Cloud Dominance"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Content = "Microsoft is leading in AI with OpenAI partnerships.",
+                            CreatedOn = new DateTime(2024, 1, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 2,
+                            Title = "AI Leader"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Content = "Google still dominates digital advertising.",
+                            CreatedOn = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 3,
+                            Title = "Ad Revenue Giant"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Content = "Search engine monopoly keeps revenue stable.",
+                            CreatedOn = new DateTime(2024, 1, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 3,
+                            Title = "Search King"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Content = "Amazon dominates global online retail.",
+                            CreatedOn = new DateTime(2024, 1, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 4,
+                            Title = "E-commerce Leader"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Content = "AWS contributes a huge portion of profits.",
+                            CreatedOn = new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 4,
+                            Title = "AWS Power"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Content = "Tesla is leading the electric vehicle revolution.",
+                            CreatedOn = new DateTime(2024, 1, 9, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 5,
+                            Title = "EV Pioneer"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Content = "Stock is highly volatile but has big growth potential.",
+                            CreatedOn = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 5,
+                            Title = "High Volatility"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Content = "Nvidia is benefiting massively from AI demand.",
+                            CreatedOn = new DateTime(2024, 1, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 6,
+                            Title = "AI Boom"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Content = "Top player in GPUs for gaming and data centers.",
+                            CreatedOn = new DateTime(2024, 1, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            StockId = 6,
+                            Title = "GPU Leader"
+                        });
                 });
 
             modelBuilder.Entity("StockApplicationApi.Models.Stock", b =>

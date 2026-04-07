@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockApplicationApi.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class CommentSeeder : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -63,6 +63,25 @@ namespace StockApplicationApi.Migrations
                     { 4, "Amazon", "E-Commerce", 0.00m, 1600000000000L, 155.80m, "AMZN" },
                     { 5, "Tesla", "Automotive", 0.00m, 700000000000L, 210.40m, "TSLA" },
                     { 6, "Nvidia", "Semiconductors", 0.16m, 2200000000000L, 600.75m, "NVDA" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Comments",
+                columns: new[] { "Id", "Content", "CreatedOn", "StockId", "Title" },
+                values: new object[,]
+                {
+                    { 1, "Apple has one of the strongest ecosystems with loyal customers.", new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "Strong Ecosystem" },
+                    { 2, "Consistent performance and reliable dividends.", new DateTime(2024, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, "Stable Growth" },
+                    { 3, "Azure is driving massive growth for Microsoft.", new DateTime(2024, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "Cloud Dominance" },
+                    { 4, "Microsoft is leading in AI with OpenAI partnerships.", new DateTime(2024, 1, 4, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "AI Leader" },
+                    { 5, "Google still dominates digital advertising.", new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "Ad Revenue Giant" },
+                    { 6, "Search engine monopoly keeps revenue stable.", new DateTime(2024, 1, 6, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "Search King" },
+                    { 7, "Amazon dominates global online retail.", new DateTime(2024, 1, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, "E-commerce Leader" },
+                    { 8, "AWS contributes a huge portion of profits.", new DateTime(2024, 1, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), 4, "AWS Power" },
+                    { 9, "Tesla is leading the electric vehicle revolution.", new DateTime(2024, 1, 9, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, "EV Pioneer" },
+                    { 10, "Stock is highly volatile but has big growth potential.", new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, "High Volatility" },
+                    { 11, "Nvidia is benefiting massively from AI demand.", new DateTime(2024, 1, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, "AI Boom" },
+                    { 12, "Top player in GPUs for gaming and data centers.", new DateTime(2024, 1, 12, 0, 0, 0, 0, DateTimeKind.Unspecified), 6, "GPU Leader" }
                 });
 
             migrationBuilder.CreateIndex(

@@ -10,6 +10,6 @@
 
         public int? StockId {  get; set; }
 
-        public Stock? Stocks { get; set; }
+      
     }
 }

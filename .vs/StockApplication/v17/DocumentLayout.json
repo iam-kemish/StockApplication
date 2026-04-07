@@ -3,6 +3,14 @@
   "WorkspaceRootPath": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Migrations\\20260407114524_Issue.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:StockApplicationApi\\Migrations\\20260407114524_Issue.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|c:\\users\\kemis\\source\\repos\\stockapplication\\stockapplicationapi\\models\\comment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|solutionrelative:stockapplicationapi\\models\\comment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{AEB3E845-2D7B-458B-8E0A-1BDC5637A735}|StockApplication.UnitTests\\StockApplication.UnitTests.csproj|c:\\users\\kemis\\source\\repos\\stockapplication\\stockapplication.unittests\\services\\commentservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{AEB3E845-2D7B-458B-8E0A-1BDC5637A735}|StockApplication.UnitTests\\StockApplication.UnitTests.csproj|solutionrelative:stockapplication.unittests\\services\\commentservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -18,11 +26,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "20260407114524_Issue.cs",
+              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Migrations\\20260407114524_Issue.cs",
+              "RelativeDocumentMoniker": "StockApplicationApi\\Migrations\\20260407114524_Issue.cs",
+              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Migrations\\20260407114524_Issue.cs",
+              "RelativeToolTip": "StockApplicationApi\\Migrations\\20260407114524_Issue.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-07T11:45:24.399Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "Comment.cs",
+              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Models\\Comment.cs",
+              "RelativeDocumentMoniker": "StockApplicationApi\\Models\\Comment.cs",
+              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Models\\Comment.cs",
+              "RelativeToolTip": "StockApplicationApi\\Models\\Comment.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-07T11:44:26.275Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Program.cs",
               "RelativeDocumentMoniker": "StockApplicationApi\\Program.cs",
@@ -30,16 +64,15 @@
               "RelativeToolTip": "StockApplicationApi\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-07T11:01:07.483Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-07T11:01:07.483Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "CommentServiceTests.cs",
-              "DocumentMoniker": "C:\\Users\\Kemis\\Source\\Repos\\StockApplication\\StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
+              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
               "RelativeDocumentMoniker": "StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
-              "ToolTip": "C:\\Users\\Kemis\\Source\\Repos\\StockApplication\\StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
+              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
               "RelativeToolTip": "StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
               "ViewState": "AgIAABwAAAAAAAAAAAAAACUAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",

@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
+using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.CommentDTOs;
 using StockApplicationApi.Repositary.CommentRepositary;
+using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.CommentServices;
 
 namespace StockApplication.UnitTests.Services
@@ -12,14 +15,33 @@ namespace StockApplication.UnitTests.Services
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<IComment> _mockRepo;
         private readonly CommentService _service;
+        private readonly Mock<IStock>  _IStock;
 
         public CommentServiceTests()
         {
             _mockMapper = new Mock<IMapper>();
             _mockRepo = new Mock<IComment>();
-            _service = new CommentService(_mockRepo.Object, _mockMapper.Object);
+            _IStock = new Mock<IStock>();
+            _service = new CommentService(_mockRepo.Object, _mockMapper.Object, _IStock.Object);
         }
         [Fact]
+        public async Task AddComment_StockNotFound_ThrowsConflictException()
+        {
+            var createCommentDto = new CreateComment
+            {
+                Title = "Test Comment",
+                Content = "This is a test comment",
+                StockId = 1
+            };
+            _IStock.Setup(r => r.StockExists(createCommentDto.StockId)).ReturnsAsync(false);
+            var ex = await Assert.ThrowsAsync<ConflictException>(
+             () => _service.AddComment(createCommentDto)        
+         );
+
+            Assert.Equal("This stock doesnt exist in stock database", ex.Message );
+
+        }
+            [Fact]
         public async Task AddComment_ValidComment_ReturnsCommentDTO()
         {
             var CommentEntity = new Comment
@@ -47,7 +69,8 @@ namespace StockApplication.UnitTests.Services
             };
             _mockMapper.Setup(m => m.Map<Comment>(createCommentDto))
                      .Returns(CommentEntity);
-
+            _IStock.Setup(r => r.StockExists(createCommentDto.StockId))
+       .ReturnsAsync(true);
 
             _mockMapper.Setup(m => m.Map<CommentDto>(CommentEntity))
                        .Returns(commentDto);

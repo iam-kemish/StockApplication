@@ -47,6 +47,11 @@ namespace StockApplicationApi.Repositary.StockRepositary
             return query.FirstOrDefaultAsync();
         }
 
+        public Task<bool> StockExists(int? id)
+        {
+            return _Db.Stocks.AnyAsync(u => u.Id == id);
+        }
+
         public async Task UpdateStock(Stock Stock)
         {
             _Db.Stocks.Update(Stock);

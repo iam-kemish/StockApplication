@@ -71,12 +71,12 @@ namespace StockApplicationApi.Services.StockServices
             return _IMapper.Map<StockDTO>(stock);
         }
 
-        public async Task<StockDTO> UpdateStock(StockUpdateDTO stock)
+        public async Task<StockDTO> UpdateStock(int id, StockUpdateDTO stock)
         {
-            var existingStock = await _IStock.GetStock(u => u.Id == stock.Id);
+            var existingStock = await _IStock.GetStock(u => u.Id == id);
             if (existingStock == null)
             {
-                throw new NotFoundException("Stock", stock.Id);
+                throw new NotFoundException("Stock", id);
             }
 
            

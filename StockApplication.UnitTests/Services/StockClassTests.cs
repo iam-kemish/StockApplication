@@ -254,7 +254,8 @@ namespace StockApplicationApi.UnitTests.Services
         [Fact]
         public async Task UpdateStock_StockNotFound_ThrowsNotFoundException()
         {
-            StockUpdateDTO stockUpdateDTO = new() { Id = 1 };
+            StockUpdateDTO stockUpdateDTO = new();
+            int id = 1;
 
 
             // mock repo returns null → stock not found in DB
@@ -263,7 +264,7 @@ namespace StockApplicationApi.UnitTests.Services
 
             // ACT
             var ex = await Assert.ThrowsAsync<NotFoundException>(
-                () => _service.UpdateStock(stockUpdateDTO)
+                () => _service.UpdateStock(id, stockUpdateDTO)
             );
 
             // ASSERT
@@ -277,7 +278,7 @@ namespace StockApplicationApi.UnitTests.Services
         {
             StockUpdateDTO stockUpdateDTO = new()
             {
-                Id = 1,
+               
                 CompanyName = "Tesla Updated",
                 Symbol = "TSLA",
                 MarketCap = 9000,
@@ -295,15 +296,16 @@ namespace StockApplicationApi.UnitTests.Services
                 LastDiv = 2.0m,
                 Industry = "Auto"
             };
+            int id = 1;
             Stock result = null;
             _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
              .ReturnsAsync(existingStock);
 
-            _mockRepo.Setup(r => r.UpdateStock(It.IsAny<Stock>()))
+            _mockRepo.Setup(r => r.UpdateStock(It.IsAny<Stock>())).Callback<Stock>(u=>result =u)
                     .Returns(Task.CompletedTask);
             _mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
               .Returns(new StockDTO());
-            await _service.UpdateStock(stockUpdateDTO);
+            await _service.UpdateStock(id, stockUpdateDTO);
 
             Assert.NotNull(result);
             Assert.NotNull(result);

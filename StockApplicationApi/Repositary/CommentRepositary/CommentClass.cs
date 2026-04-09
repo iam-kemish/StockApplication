@@ -27,5 +27,11 @@ namespace StockApplicationApi.Repositary.CommentRepositary
             }
             return await query.ToListAsync();
         }
+
+        public async Task UpdateComment(Comment comment)
+        {
+            _context.Comments.Update(comment);
+            await _context.SaveChangesAsync();
+        }
     }
 }

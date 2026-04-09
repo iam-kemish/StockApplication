@@ -3,12 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{AEB3E845-2D7B-458B-8E0A-1BDC5637A735}|StockApplication.UnitTests\\StockApplication.UnitTests.csproj|c:\\users\\kemis\\source\\repos\\stockapplication\\stockapplication.unittests\\services\\commentservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AEB3E845-2D7B-458B-8E0A-1BDC5637A735}|StockApplication.UnitTests\\StockApplication.UnitTests.csproj|solutionrelative:stockapplication.unittests\\services\\commentservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|c:\\users\\kemis\\source\\repos\\stockapplication\\stockapplicationapi\\services\\commentservices\\commentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1FF7AB9F-DA1B-48B3-8757-B614FD547E5C}|StockApplicationApi\\StockApplicationApi.csproj|solutionrelative:stockapplicationapi\\services\\commentservices\\commentservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AEB3E845-2D7B-458B-8E0A-1BDC5637A735}|StockApplication.UnitTests\\StockApplication.UnitTests.csproj|c:\\users\\kemis\\source\\repos\\stockapplication\\stockapplication.unittests\\services\\stockclasstests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AEB3E845-2D7B-458B-8E0A-1BDC5637A735}|StockApplication.UnitTests\\StockApplication.UnitTests.csproj|solutionrelative:stockapplication.unittests\\services\\stockclasstests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -23,27 +19,14 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "CommentServiceTests.cs",
-              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
-              "RelativeDocumentMoniker": "StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
-              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
-              "RelativeToolTip": "StockApplication.UnitTests\\Services\\CommentServiceTests.cs",
-              "ViewState": "AgIAADoAAAAAAAAAAAAUwEgAAAAbAAAAAAAAAA==",
+              "Title": "StockClassTests.cs",
+              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplication.UnitTests\\Services\\StockClassTests.cs",
+              "RelativeDocumentMoniker": "StockApplication.UnitTests\\Services\\StockClassTests.cs",
+              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplication.UnitTests\\Services\\StockClassTests.cs",
+              "RelativeToolTip": "StockApplication.UnitTests\\Services\\StockClassTests.cs",
+              "ViewState": "AgIAABsBAAAAAAAAAAAAACgBAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-08T10:37:41.359Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "CommentService.cs",
-              "DocumentMoniker": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Services\\CommentServices\\CommentService.cs",
-              "RelativeDocumentMoniker": "StockApplicationApi\\Services\\CommentServices\\CommentService.cs",
-              "ToolTip": "C:\\Users\\Kemis\\source\\repos\\StockApplication\\StockApplicationApi\\Services\\CommentServices\\CommentService.cs",
-              "RelativeToolTip": "StockApplicationApi\\Services\\CommentServices\\CommentService.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAwwBYAAABFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-08T10:23:08.582Z",
+              "WhenOpened": "2026-04-08T12:02:47.187Z",
               "EditorCaption": ""
             }
           ]

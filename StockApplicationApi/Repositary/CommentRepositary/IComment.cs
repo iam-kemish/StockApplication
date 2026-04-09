@@ -7,5 +7,6 @@ namespace StockApplicationApi.Repositary.CommentRepositary
     {
         Task<IEnumerable<Comment>> GetAllComments(Expression<Func<Comment, bool>>? filter = null);
         Task AddComment(Comment comment);
+        Task UpdateComment(Comment comment);
     }
 }

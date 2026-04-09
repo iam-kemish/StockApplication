@@ -71,9 +71,8 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update( [FromBody] StockUpdateDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] StockUpdateDTO dto)
         {
-            // Enforce consistency between route and body
            
             var validationResult = await _updateValidator.ValidateAsync(dto);
 
@@ -89,7 +88,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var updatedStock = await _stockService.UpdateStock(dto);
+            var updatedStock = await _stockService.UpdateStock(id, dto);
 
             return Ok(new APIResponse
             {

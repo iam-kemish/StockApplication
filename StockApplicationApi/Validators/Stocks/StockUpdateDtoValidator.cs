@@ -7,9 +7,7 @@ namespace StockApplicationApi.Validators.Stocks
     {
         public StockUpdateDtoValidator()
         {
-            RuleFor(x => x.Id)
-           .NotEmpty().WithMessage("ID is required for update")
-           .GreaterThan(0).WithMessage("ID must be a positive number");
+           
 
             RuleFor(x => x.Symbol)
                .NotEmpty().WithMessage("Symbol is required")

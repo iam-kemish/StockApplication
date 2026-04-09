@@ -7,7 +7,7 @@ namespace StockApplicationApi.Services.StockServices
         Task<IEnumerable<StockDTO>> GetAllStocks();        
         Task<StockDTO> GetStockById(int id);
         Task<StockDTO> AddStock(StockCreateDTO stock);
-        Task <StockDTO>UpdateStock(StockUpdateDTO stock);          
+        Task <StockDTO>UpdateStock(int id, StockUpdateDTO stock);          
         Task DeleteStock(int id);
     }
 }

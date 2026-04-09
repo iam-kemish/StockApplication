@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.CommentDTOs;
+using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 
@@ -12,6 +14,7 @@ namespace StockApplicationApi.Services.CommentServices
         private readonly IComment _IComment;
         private readonly IMapper _IMapper;
         private readonly IStock _IStock;
+     
 
         public CommentService(IComment comment ,IMapper mapper, IStock stock)
         {
@@ -36,6 +39,34 @@ namespace StockApplicationApi.Services.CommentServices
         {
           var comments = await  _IComment.GetAllComments();
           return  _IMapper.Map<IEnumerable<CommentDto>>(comments);
+        }
+
+        public async Task<CommentDto> GetCommentById(int id)
+        {
+            var comment = await _IComment.GetComment(u => u.Id == id);
+            if (comment == null)
+            {
+                throw new NotFoundException("Stock", id);
+            }
+            return _IMapper.Map<CommentDto>(comment);
+        }
+
+        public async Task<CommentDto> UpdateComment(int id, CommentUpdateDTO comment)
+        {
+            var existingComment = await _IComment.GetComment(u => u.Id == id);
+            if (existingComment == null)
+            {
+                throw new NotFoundException("Comment", id);
+            }
+
+
+            existingComment.Title = comment.Title;
+            existingComment.Content = comment.Content;
+            
+
+            await _IComment.UpdateComment(existingComment);
+
+            return _IMapper.Map<CommentDto>(existingComment);
         }
     }
 }

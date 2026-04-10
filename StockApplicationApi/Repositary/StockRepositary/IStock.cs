@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
+using StockApplicationApi.Helpers;
 using StockApplicationApi.Models;
 using System.Linq.Expressions;
 
@@ -6,7 +7,7 @@ namespace StockApplicationApi.Repositary.StockRepositary
 {
     public interface IStock
     {
-        Task<IEnumerable<Stock>> GetAllStocks(Expression<Func<Stock, bool>>? filter = null);
+        Task<IEnumerable<Stock>> GetAllStocks(StockQuery stockQuery);
   
         Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null);
         Task AddStock(Stock Stock);

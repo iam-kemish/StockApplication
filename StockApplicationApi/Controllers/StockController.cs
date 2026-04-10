@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using StockApplicationApi.Exceptions;
+using StockApplicationApi.Helpers;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Services.StockServices;
@@ -102,9 +103,9 @@ namespace StockApplicationApi.Controllers
       
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] StockQuery stockQuery)
         {
-            var stocks = await _stockService.GetAllStocks();
+            var stocks = await _stockService.GetAllStocks(stockQuery);
 
             return Ok(new APIResponse
             {

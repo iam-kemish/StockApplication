@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using StockApplicationApi.Database;
+using StockApplicationApi.Helpers;
 using StockApplicationApi.Models;
 
 namespace StockApplicationApi.Repositary.StockRepositary
@@ -25,14 +26,19 @@ namespace StockApplicationApi.Repositary.StockRepositary
            await _Db.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Stock>> GetAllStocks(Expression<Func<Stock, bool>>? filter = null)
+        public async Task<IEnumerable<Stock>> GetAllStocks(StockQuery stockQuery)
         {
             var query = _Db.Stocks.Include(p => p.Comments).AsNoTracking().AsQueryable();
-            if (filter != null) 
+            if (!string.IsNullOrWhiteSpace(stockQuery.CompanyName))
             {
-                query = query.Where(filter);
+                query = query.Where(u => u.CompanyName.ToLower().Contains(stockQuery.CompanyName.ToLower()));
             }
-           return await query.ToListAsync();
+            if (!string.IsNullOrWhiteSpace(stockQuery.Symbol))
+            {
+                query = query.Where(u => u.Symbol.ToLower().Contains(stockQuery.Symbol.ToLower()));
+            }
+
+            return await query.ToListAsync();
         }
 
      

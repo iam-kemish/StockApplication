@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using StockApplicationApi.Exceptions;
+using StockApplicationApi.Helpers;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.StockRepositary;
@@ -53,11 +54,10 @@ namespace StockApplicationApi.Services.StockServices
             await _IStock.DeleteStock(stock);
         }
 
-        public async Task<IEnumerable<StockDTO>> GetAllStocks()
+        public async Task<IEnumerable<StockDTO>> GetAllStocks(StockQuery stockQuery)
         {
-            var stocks = await _IStock.GetAllStocks();
-            // Usually you don't throw when list is empty — just return empty list
-            // So better to remove this check completely
+            var stocks = await _IStock.GetAllStocks(stockQuery);
+            
             return _IMapper.Map<IEnumerable<StockDTO>>(stocks);
         }
 

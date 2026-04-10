@@ -72,9 +72,19 @@ namespace StockApplicationApi.Controllers
             }
              );    
         }
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var comment = await _IComment.GetCommentById(id);
+            return Ok(new APIResponse
+            {
+                IsSuccess = true,
+                statusCode = HttpStatusCode.OK,
+                Result = comment
+            });
+        }
 
-
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] CommentUpdateDTO dto)
         {
 

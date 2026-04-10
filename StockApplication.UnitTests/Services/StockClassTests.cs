@@ -274,6 +274,7 @@ namespace StockApplicationApi.UnitTests.Services
             _mockRepo.Verify(r => r.UpdateStock(It.IsAny<Stock>()), Times.Never);
 
         }
+        [Fact]
         public async Task UpdateStock_ValidStock_FieldsAreCorrectlyMapped()
         {
             StockUpdateDTO stockUpdateDTO = new()

@@ -4,9 +4,11 @@ using Moq;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.CommentDTOs;
+using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.CommentServices;
+using System.Linq.Expressions;
 
 namespace StockApplication.UnitTests.Services
 {
@@ -93,6 +95,68 @@ namespace StockApplication.UnitTests.Services
 
             
             _mockMapper.Verify(m => m.Map<CommentDto>(CommentEntity), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdateComment_CommentNotFound_ThrowsNotFoundException()
+        {
+            CommentUpdateDTO commentUpdateDTO = new();
+            int id = 1;
+
+
+            // mock repo returns null → stock not found in DB
+            _mockRepo.Setup(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>()))
+                     .ReturnsAsync((Comment)null);
+
+            // ACT
+            var ex = await Assert.ThrowsAsync<NotFoundException>(
+                () => _service.UpdateComment(id, commentUpdateDTO)
+            );
+
+            // ASSERT
+            Assert.Equal("Comment with identifier '1' was not found.", ex.Message);
+
+            // prove update was never called because stock was not found
+            _mockRepo.Verify(r => r.UpdateComment(It.IsAny<Comment>()), Times.Never);
+
+        }
+        [Fact]
+        public async Task UpdateComment_ValidComment_FieldsAreCorrectlyMapped()
+        {
+            CommentUpdateDTO commentUpdateDTO = new()
+            {
+              Title = "TITLEUPDATED",
+              Content= "THIS IS CONTENT"
+            };
+            Comment existingComment = new()
+            {
+                Id = 1,
+              Title = "TITLE",
+              Content="THIS IS CONTENT"
+            };
+            int id = 1;
+            Comment result = null;
+            _mockRepo.Setup(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>()))
+             .ReturnsAsync(existingComment);
+
+            _mockRepo.Setup(r => r.UpdateComment(It.IsAny<Comment>())).Callback<Comment>(u => result = u)
+                    .Returns(Task.CompletedTask);
+            _mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
+              .Returns(new StockDTO());
+            await _service.UpdateComment(id, commentUpdateDTO);
+
+            Assert.NotNull(result);
+            Assert.NotNull(result);
+            Assert.Equal("TITLEUPDATED", result.Title);
+            Assert.Equal("THIS IS CONTENT", result.Content);
+           
+
+            _mockRepo.Verify(r => r.UpdateComment(result), Times.Once);
+
+
+            _mockMapper.Verify(m => m.Map<CommentDto>(existingComment), Times.Once);
+
+
         }
     }
 }

@@ -48,8 +48,9 @@ namespace StockApplicationApi.Repositary.StockRepositary
                     query = stockQuery.IsDescending ? query.OrderByDescending(u => u.MarketCap) : query.OrderBy(u => u.MarketCap);
                 }
             }
+            var skipNumber = (stockQuery.PageNumber - 1) * stockQuery.PageSize;
 
-            return await query.ToListAsync();
+            return await query.Skip(skipNumber).Take(stockQuery.PageSize).ToListAsync();
         }
 
      

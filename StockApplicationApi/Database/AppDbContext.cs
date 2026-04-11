@@ -13,6 +13,7 @@ namespace StockApplicationApi.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Stock>().HasData(
                  new Stock { Id = 1, Symbol = "NVDA", CompanyName = "Nvidia", Purchase = 188.60m, LastDiv = 0.16m, Industry = "Semiconductors", MarketCap = 4300000000000 },
                 new Stock { Id = 2, Symbol = "AAPL", CompanyName = "Apple Inc", Purchase = 260.45m, LastDiv = 0.24m, Industry = "Technology", MarketCap = 3800000000000 },

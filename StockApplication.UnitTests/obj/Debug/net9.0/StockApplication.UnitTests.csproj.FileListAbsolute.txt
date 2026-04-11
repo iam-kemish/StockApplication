@@ -329,3 +329,5 @@ C:\Users\Kemis\source\repos\StockApplication\StockApplication.UnitTests\obj\Debu
 C:\Users\Kemis\source\repos\StockApplication\StockApplication.UnitTests\obj\Debug\net9.0\StockApp.3001F8CD.Up2Date
 C:\Users\Kemis\source\repos\StockApplication\StockApplication.UnitTests\obj\Debug\net9.0\StockApplication.UnitTests.genruntimeconfig.cache
 C:\Users\Kemis\source\repos\StockApplication\StockApplication.UnitTests\obj\Debug\net9.0\ref\StockApplication.UnitTests.dll
+C:\Users\Kemis\Source\Repos\StockApplication\StockApplication.UnitTests\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Kemis\Source\Repos\StockApplication\StockApplication.UnitTests\bin\Debug\net9.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

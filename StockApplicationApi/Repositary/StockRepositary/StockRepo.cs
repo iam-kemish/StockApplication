@@ -37,6 +37,17 @@ namespace StockApplicationApi.Repositary.StockRepositary
             {
                 query = query.Where(u => u.Symbol.ToLower().Contains(stockQuery.Symbol.ToLower()));
             }
+            if (!string.IsNullOrWhiteSpace(stockQuery.SortBy))
+            {
+                if(stockQuery.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = stockQuery.IsDescending ? query.OrderByDescending(u=>u.Symbol) : query.OrderBy(u=>u.Symbol);
+                }
+                if(stockQuery.SortBy.Equals("Marketcap", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = stockQuery.IsDescending ? query.OrderByDescending(u => u.MarketCap) : query.OrderBy(u => u.MarketCap);
+                }
+            }
 
             return await query.ToListAsync();
         }

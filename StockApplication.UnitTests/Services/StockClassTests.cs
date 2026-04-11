@@ -200,19 +200,18 @@ namespace StockApplicationApi.UnitTests.Services
 
             int stockId = 1;
 
-            // mock repo returns null → stock not found in DB
+           
             _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
                      .ReturnsAsync((Stock)null);
 
-            // ACT
+          
             var ex = await Assert.ThrowsAsync<NotFoundException>(
                 () => _service.DeleteStock(stockId)
             );
 
-            // ASSERT
             Assert.Equal("Stock with identifier '1' was not found.", ex.Message);
 
-            // prove delete was never called because stock was not found
+          
             _mockRepo.Verify(r => r.DeleteStock(It.IsAny<Stock>()), Times.Never);
         }
 
@@ -234,15 +233,15 @@ namespace StockApplicationApi.UnitTests.Services
                 MarketCap = 1000000000
             };
 
-            // mock repo returns stock → stock found in DB
+         
             _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
                      .ReturnsAsync(stockEntity);
 
-            // mock repo delete → pretend delete succeeded
+           
             _mockRepo.Setup(r => r.DeleteStock(stockEntity))
                      .Returns(Task.CompletedTask);
 
-            // ACT
+         
             await _service.DeleteStock(stockId);
 
 

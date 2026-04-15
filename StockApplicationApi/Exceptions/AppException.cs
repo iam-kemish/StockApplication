@@ -42,7 +42,23 @@ namespace StockApplicationApi.Exceptions
         {
         }
     }
+    public sealed class UnAuthorizedException : AppException
+    {
+        public UnAuthorizedException(string message)
+            :base(message, HttpStatusCode.Unauthorized)
+        {        
+        }
+    }
+    public class OperationFailedException : AppException
+    {
+        public IEnumerable<string> Errors { get; }
 
+        public OperationFailedException(string message, IEnumerable<string> errors)
+            : base(message)
+        {
+            Errors = errors;
+        }
+    }
     // Validation errors
     public sealed class AppValidationException : AppException
     {

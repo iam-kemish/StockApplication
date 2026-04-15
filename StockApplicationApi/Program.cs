@@ -9,8 +9,10 @@ using StockApplicationApi.Mapper;
 using StockApplicationApi.Models;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
+using StockApplicationApi.Services.AuthService;
 using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Services.StockServices;
+using StockApplicationApi.Services.Token;
 using StockApplicationApi.Validators.Stocks;
 using System.Text;
 
@@ -73,14 +75,16 @@ builder.Services.AddScoped<IStock, StockRepo>();
 builder.Services.AddScoped<IStockService, StockClass>();
 builder.Services.AddScoped<IComment, CommentClass>();
 builder.Services.AddScoped<ICommentService,CommentService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService,TokenService>();
 var app = builder.Build();
 
 // Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseMiddleware<GlobalException>();
-    app.MapOpenApi();           // usually before Scalar
-    app.MapScalarApiReference(); // nice for dev docs
+    app.MapOpenApi();           
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();

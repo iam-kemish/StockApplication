@@ -64,8 +64,9 @@ public class GlobalException
                 break;
 
             default:
-                // Log real exception here in production (Serilog, NLog, etc.)
-                // response.Message = "Internal server error"; // hide real message
+                // This will show us the EXACT reason MapOpenApi is crashing
+                response.Message = exception.Message;
+                response.Errors = new { stackTrace = exception.StackTrace };
                 break;
         }
 

@@ -2,8 +2,11 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Scalar.AspNetCore;
+using Microsoft.OpenApi.Models;
+
 using StockApplicationApi.Database;
 using StockApplicationApi.Mapper;
 using StockApplicationApi.Models;
@@ -18,39 +21,28 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-
+// --- 1. SERVICES REGISTRATION ---
 builder.Services.AddControllers();
+builder.Services.AddOpenApi();
 
-
+// FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<StockCreateDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<StockUpdateDtoValidator>();
 
-
-builder.Services.AddOpenApi();
-
-// Database
+// Database & Identity
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
-{
+builder.Services.AddIdentity<AppUser, IdentityRole>(options => {
     options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
     options.Password.RequiredUniqueChars = 1;
 }).AddEntityFrameworkStores<AppDbContext>();
 
-builder.Services.AddAuthentication(options =>
-{
+// Authentication
+builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme =
-    options.DefaultChallengeScheme =
-    options.DefaultForbidScheme =
-    options.DefaultScheme =
-    options.DefaultSignInScheme =
-    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options => {
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -60,32 +52,33 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
-        ),
-       
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        )
     };
 });
 
-// AutoMapper
 builder.Services.AddAutoMapper(typeof(MapConfig));
-
-// Your services
 builder.Services.AddScoped<IStock, StockRepo>();
 builder.Services.AddScoped<IStockService, StockClass>();
 builder.Services.AddScoped<IComment, CommentClass>();
-builder.Services.AddScoped<ICommentService,CommentService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ITokenService,TokenService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 var app = builder.Build();
 
-// Pipeline
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseMiddleware<GlobalException>();
-    app.MapOpenApi();           
-    app.MapScalarApiReference();
+    app.MapOpenApi(); 
+
+    app.UseSwaggerUI(options =>
+    {
+        // Add the forward slash here!
+        options.SwaggerEndpoint("/openapi/v1.json", "Stock API v1");
+    });
 }
+
+app.UseMiddleware<GlobalException>();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

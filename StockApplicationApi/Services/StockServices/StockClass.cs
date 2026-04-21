@@ -48,7 +48,7 @@ namespace StockApplicationApi.Services.StockServices
             var stock = await _IStock.GetStock(u => u.Id == id);
             if (stock == null)
             {
-                throw new NotFoundException("Stock", id);
+                throw new NotFoundException("Does this Stock exists?");
                 // Better than plain Exception
             }
             await _IStock.DeleteStock(stock);
@@ -66,7 +66,7 @@ namespace StockApplicationApi.Services.StockServices
             var stock = await _IStock.GetStock(u => u.Id == id);
             if (stock == null)
             {
-                throw new NotFoundException("Stock", id);
+                throw new NotFoundException("Does this Stock exists?");
             }
             return _IMapper.Map<StockDTO>(stock);
         }
@@ -76,7 +76,7 @@ namespace StockApplicationApi.Services.StockServices
             var existingStock = await _IStock.GetStock(u => u.Id == id);
             if (existingStock == null)
             {
-                throw new NotFoundException("Stock", id);
+                throw new NotFoundException("Does this Stock exists?");
             }
 
            

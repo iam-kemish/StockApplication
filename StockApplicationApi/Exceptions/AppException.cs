@@ -19,12 +19,11 @@ namespace StockApplicationApi.Exceptions
     // 404 Not Found
     public sealed class NotFoundException : AppException
     {
-        public NotFoundException(string resourceName, object key)
-            : base($"{resourceName} with identifier '{key}' was not found.", HttpStatusCode.NotFound)
+        public NotFoundException(string message)
+            : base(message, HttpStatusCode.NotFound)
         {
         }
     }
-
     // 400 Bad Request
     public sealed class BadRequestException : AppException
     {

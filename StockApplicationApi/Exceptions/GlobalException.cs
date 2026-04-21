@@ -6,10 +6,12 @@ using System.Text.Json;
 public class GlobalException
 {
     private readonly RequestDelegate _next;
+    private readonly IWebHostEnvironment _env;
 
-    public GlobalException(RequestDelegate next)
+    public GlobalException(RequestDelegate next, IWebHostEnvironment webHostEnvironment)
     {
         _next = next;
+        _env = webHostEnvironment;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -36,37 +38,52 @@ public class GlobalException
 
         switch (exception)
         {
-            case AppValidationException validationEx:
+            case AppValidationException ex:
                 response.statusCode = HttpStatusCode.BadRequest;
-                response.Message = validationEx.Message;
-                response.Errors = validationEx.Errors;
+                response.Message = "Validation failed.";
+                response.Errors = ex.Errors;
                 break;
 
-            case NotFoundException notFoundEx:
+            case NotFoundException ex:
                 response.statusCode = HttpStatusCode.NotFound;
-                response.Message = notFoundEx.Message;
+                response.Message = "Resource not found.";
+                response.Errors = new { detail = ex.Message };
                 break;
 
-            case BadRequestException badRequestEx:
+            case BadRequestException ex:
                 response.statusCode = HttpStatusCode.BadRequest;
-                response.Message = badRequestEx.Message;
+                response.Message = "Invalid request.";
+                response.Errors = new { detail = ex.Message };
                 break;
 
-            case ConflictException conflictEx:
+            case ConflictException ex:
                 response.statusCode = HttpStatusCode.Conflict;
-                response.Message = conflictEx.Message;
+                response.Message = "Conflict occurred.";
+                response.Errors = new { detail = ex.Message };
                 break;
 
-            case AppException appEx:
-                // fallback for any other AppException we might add later
-                response.statusCode  = appEx.StatusCode;
-                response.Message = appEx.Message;
+            case AppException ex:
+                response.statusCode = ex.StatusCode;
+                response.Message = "Application error occurred.";
+                response.Errors = new { detail = ex.Message };
                 break;
 
             default:
-                // This will show us the EXACT reason MapOpenApi is crashing
-                response.Message = exception.Message;
-                response.Errors = new { stackTrace = exception.StackTrace };
+                response.statusCode = HttpStatusCode.InternalServerError;
+                response.Message = "Internal server error. Please try again later.";
+
+                if (_env.IsDevelopment())
+                {
+                    response.Errors = new
+                    {
+                        detail = exception.Message,
+                        stackTrace = exception.StackTrace
+                    };
+                }
+                else
+                {
+                    response.Errors = new { detail = response.Message };
+                }
                 break;
         }
 

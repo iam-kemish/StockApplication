@@ -46,7 +46,7 @@ namespace StockApplicationApi.Services.CommentServices
             var comment = await _IComment.GetComment(u => u.Id == id);
             if (comment == null)
             {
-                throw new NotFoundException("Stock", id);
+                throw new NotFoundException("does this stock exists?");
             }
             return _IMapper.Map<CommentDto>(comment);
         }
@@ -56,7 +56,7 @@ namespace StockApplicationApi.Services.CommentServices
             var existingComment = await _IComment.GetComment(u => u.Id == id);
             if (existingComment == null)
             {
-                throw new NotFoundException("Comment", id);
+                throw new NotFoundException("Does this Comment exists?");
             }
 
 

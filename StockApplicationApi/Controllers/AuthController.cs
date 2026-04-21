@@ -19,7 +19,7 @@ namespace StockApplicationApi.Controllers
             _authService = authService;
             _validator = validator;
         }
-        [HttpPost]
+        [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO dto)
         {
             var validationResult = await _validator.ValidateAsync(dto);

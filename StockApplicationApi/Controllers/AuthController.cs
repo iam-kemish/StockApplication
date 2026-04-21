@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
 using StockApplicationApi.Services.AuthService;
@@ -62,6 +63,27 @@ namespace StockApplicationApi.Controllers
 
         public async Task<IActionResult> Login([FromBody] LoginDTO dto)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value.Errors.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+               
+             return BadRequest(
+                    new APIResponse
+                    {
+                        Errors = errors,
+                        IsSuccess = false,
+                        statusCode = HttpStatusCode.BadRequest,
+                        Result = null,
+                        Message = "something went wrong."
+                    }
+                    );
+            }
             var result = await _authService.Login(dto);
             return Ok(
                     new APIResponse

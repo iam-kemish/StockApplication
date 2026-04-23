@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
 using StockApplicationApi.Services.AuthService;
@@ -62,6 +63,7 @@ namespace StockApplicationApi.Controllers
 
         public async Task<IActionResult> Login([FromBody] LoginDTO dto)
         {
+           
             var result = await _authService.Login(dto);
             return Ok(
                     new APIResponse

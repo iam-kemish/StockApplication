@@ -64,13 +64,14 @@ namespace StockApplicationApi.Services.AuthService
             // find user by email
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
+
                 throw new NotFoundException("Invalid credentials this username might be wrong or empty");
 
-        
+
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
             if (!isPasswordValid)
             {
-                throw new UnAuthorizedException("Invalid credentials");
+                throw new UnAuthorizedException("Invalid credentials check if Password is wrong or empty.");
             }
             var token = _tokenService.CreateAccessToken(user);
 

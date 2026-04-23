@@ -4,6 +4,6 @@ namespace StockApplicationApi.Services.Token
 {
     public interface ITokenService
     {
-        string CreateAccessToken(AppUser user);
+      Task<string>   CreateAccessToken(AppUser user);
     }
 }

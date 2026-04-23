@@ -79,7 +79,7 @@ namespace StockApplicationApi.Services.AuthService
             {
                 UserName = user.UserName,
                 Email = user.Email,
-                Token = token
+                Token = await token
             };
         }
     }

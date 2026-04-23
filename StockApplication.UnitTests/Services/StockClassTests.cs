@@ -209,7 +209,7 @@ namespace StockApplicationApi.UnitTests.Services
                 () => _service.DeleteStock(stockId)
             );
 
-            Assert.Equal("Stock with identifier '1' was not found.", ex.Message);
+            Assert.Equal("Does this Stock exists?", ex.Message);
 
           
             _mockRepo.Verify(r => r.DeleteStock(It.IsAny<Stock>()), Times.Never);
@@ -267,7 +267,7 @@ namespace StockApplicationApi.UnitTests.Services
             );
 
             // ASSERT
-            Assert.Equal("Stock with identifier '1' was not found.", ex.Message);
+            Assert.Equal("Does this Stock exists?", ex.Message);
 
             // prove update was never called because stock was not found
             _mockRepo.Verify(r => r.UpdateStock(It.IsAny<Stock>()), Times.Never);

@@ -24,7 +24,7 @@ namespace StockApplicationApi.Services.AuthService
 
         public async Task<AuthResponseDTO> Register(RegisterDTO dto)
         {
-          
+
             var existingUser = await _userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null)
             {
@@ -41,7 +41,7 @@ namespace StockApplicationApi.Services.AuthService
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => e.Description);
-                throw new OperationFailedException("Operation failed",errors);
+                throw new OperationFailedException("Operation failed", errors);
             }
 
             // create Customer role if doesnt exist
@@ -82,5 +82,6 @@ namespace StockApplicationApi.Services.AuthService
                 Token = await token
             };
         }
+
     }
 }

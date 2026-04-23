@@ -114,7 +114,7 @@ namespace StockApplication.UnitTests.Services
             );
 
             // ASSERT
-            Assert.Equal("Comment with identifier '1' was not found.", ex.Message);
+            Assert.Equal("Does this Comment exists?", ex.Message);
 
             // prove update was never called because stock was not found
             _mockRepo.Verify(r => r.UpdateComment(It.IsAny<Comment>()), Times.Never);

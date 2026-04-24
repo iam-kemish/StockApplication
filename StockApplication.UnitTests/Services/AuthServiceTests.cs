@@ -61,9 +61,117 @@ namespace StockApplication.UnitTests.Services
             Assert.Equal("Operation failed", ex.Message);
         }
         [Fact]
+        public async Task Register_ShouldNotCreateRole_WhenCustomerRoleAlreadyExists()
+        {
+            var dto = new RegisterDTO
+            {
+                UserName = "testuser",
+                Email = "test@example.com",
+                Password = "Test@1234"
+            };
+            _userManagerMock
+                          .Setup(x => x.FindByEmailAsync(dto.Email))
+                          .ReturnsAsync((AppUser)null);
+
+            _userManagerMock
+                .Setup(x => x.CreateAsync(It.IsAny<AppUser>(), dto.Password))
+                .ReturnsAsync(IdentityResult.Success);
+
+            _roleManagerMock
+                .Setup(x => x.RoleExistsAsync("Customer"))
+                .ReturnsAsync(true);
+            _userManagerMock
+               .Setup(x => x.AddToRoleAsync(It.IsAny<AppUser>(), "Customer"))
+               .ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            await _sut.Register(dto);
+            _roleManagerMock.Verify(
+               x => x.CreateAsync(It.IsAny<IdentityRole>()),
+               Times.Never
+               );
+        }
+        [Fact]
         public async Task Register_ShouldAssignCustomerRole_AfterSuccessfulCreation()
         {
+            var dto = new RegisterDTO
+            {
+                UserName = "testuser",
+                Email = "test@example.com",
+                Password = "Test@1234"
+            };
+            _userManagerMock
+                          .Setup(x => x.FindByEmailAsync(dto.Email))
+                          .ReturnsAsync((AppUser)null);
 
+            _userManagerMock
+                .Setup(x => x.CreateAsync(It.IsAny<AppUser>(), dto.Password))
+                .ReturnsAsync(IdentityResult.Success);
+
+            _roleManagerMock
+                .Setup(x => x.RoleExistsAsync("Customer"))
+                .ReturnsAsync(false);
+            _userManagerMock
+               .Setup(x => x.AddToRoleAsync(It.IsAny<AppUser>(), "Customer"))
+               .ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            await _sut.Register(dto);
+            _roleManagerMock.Verify(
+               x => x.CreateAsync(It.IsAny<IdentityRole>()),
+               Times.Once
+               );
+
+        }
+        [Fact]
+        public async Task Login_ShouldThrowNotFoundException_WhenUserNotFound()
+        {
+            var dto = new LoginDTO
+            {
+                Email = "kem@gmail.com",
+                Password = "Test@1234"
+            };
+            var user = new AppUser { Email = dto.Email, UserName = "User" };
+            _userManagerMock.Setup(um => um.FindByEmailAsync(dto.Email))
+                .ReturnsAsync((AppUser)null);
+            var ex = await Assert.ThrowsAsync<NotFoundException>(() => _sut.Login(dto));
+            Assert.Equal("Invalid credentials this username might be wrong or empty", ex.Message);
+        }
+        [Fact]
+        public async Task Login_ShouldThrowUnAuthorizedException_WhenPasswordIsIncorrect()
+        {
+            var dto = new LoginDTO
+            {
+                Email = "kem@gmail.com",
+                Password = "Test@1234"
+            };
+            var user = new AppUser { Email = dto.Email, UserName = "User" };
+            _userManagerMock.Setup(um => um.FindByEmailAsync(dto.Email))
+                .ReturnsAsync(user);
+            _userManagerMock.Setup(um => um.CheckPasswordAsync(user, dto.Password))
+                .ReturnsAsync(false);
+            var ex = await Assert.ThrowsAsync<UnAuthorizedException>(() => _sut.Login(dto));
+            Assert.Equal("Invalid credentials this password might be wrong or empty", ex.Message);
+        }
+        [Fact]
+        public async Task Login_ShouldReturnAuthResponseDTO_WhenCredentialsAreValid()
+        {
+            var dto = new LoginDTO
+            {
+                Email = "kem@gmail.com",
+                Password = "Test@1234"
+            };
+            var user = new AppUser { Email = dto.Email, UserName = "User" };
+            _userManagerMock.Setup(u => u.FindByEmailAsync(dto.Email)).ReturnsAsync(user);
+                        _userManagerMock.Setup(u => u.CheckPasswordAsync(user, dto.Password)).ReturnsAsync(true);
+            _tokenServiceMock.Setup(t => t.CreateAccessToken(user)).ReturnsAsync("token");
+
+            var result = await _sut.Login(dto);
+
+            Assert.Equal(user.UserName, result.UserName);
+            Assert.Equal(user.Email, result.Email);
+            Assert.Equal("token", result.Token);
         }
     }
 }
+    

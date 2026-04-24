@@ -82,6 +82,6 @@ namespace StockApplicationApi.Services.AuthService
                 Token = await token
             };
         }
-
+        
     }
 }

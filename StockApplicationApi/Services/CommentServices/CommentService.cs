@@ -14,38 +14,43 @@ namespace StockApplicationApi.Services.CommentServices
         private readonly IComment _IComment;
         private readonly IMapper _IMapper;
         private readonly IStock _IStock;
-     
+        private readonly ILogger<CommentService> _logger;
 
-        public CommentService(IComment comment ,IMapper mapper, IStock stock)
+        public CommentService(IComment comment ,IMapper mapper, IStock stock, ILogger<CommentService> logger)
         {
             _IComment = comment;
             _IMapper = mapper;
             _IStock = stock;
-         
+            _logger = logger;
+        
         }
         public async Task<CommentDto> AddComment(CreateComment comment)
         {
          if ( !await _IStock.StockExists(comment.StockId))
             {
+                _logger.LogWarning("Attempt to add comment for non-existing stockId: {StockId}", comment.StockId);
                 throw new ConflictException("This stock doesnt exist in stock database");
             }
             var createdComment = _IMapper.Map<Comment>(comment);
             await _IComment.AddComment(createdComment);
-
+            _logger.LogInformation("Comment added for stockId: {StockId}", comment.StockId);
             return _IMapper.Map<CommentDto>(createdComment);
         }
 
         public async Task<IEnumerable<CommentDto>> GetAllComments()
         {
-          var comments = await  _IComment.GetAllComments();
+            _logger.LogInformation("Retrieving all comments");
+            var comments = await  _IComment.GetAllComments();
           return  _IMapper.Map<IEnumerable<CommentDto>>(comments);
         }
 
         public async Task<CommentDto> GetCommentById(int id)
         {
+            _logger.LogInformation("Retrieving comment with id: {CommentId}", id);
             var comment = await _IComment.GetComment(u => u.Id == id);
             if (comment == null)
             {
+                _logger.LogWarning("Comment with id: {CommentId} not found", id);
                 throw new NotFoundException("does this stock exists?");
             }
             return _IMapper.Map<CommentDto>(comment);
@@ -56,6 +61,7 @@ namespace StockApplicationApi.Services.CommentServices
             var existingComment = await _IComment.GetComment(u => u.Id == id);
             if (existingComment == null)
             {
+                _logger.LogWarning("Attempt to update non-existing comment with id: {CommentId}", id);
                 throw new NotFoundException("Does this Comment exists?");
             }
 
@@ -65,6 +71,7 @@ namespace StockApplicationApi.Services.CommentServices
             
 
             await _IComment.UpdateComment(existingComment);
+            _logger.LogInformation("Comment with id: {CommentId} updated successfully", id);
 
             return _IMapper.Map<CommentDto>(existingComment);
         }

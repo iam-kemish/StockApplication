@@ -11,15 +11,18 @@ namespace StockApplicationApi.Services.AuthService
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ITokenService _tokenService;
+        private readonly ILogger<AuthService> _logger;
 
         public AuthService(
             UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            ITokenService tokenService)
+            ITokenService tokenService,
+            ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
+            _logger = logger;
         }
 
         public async Task<AuthResponseDTO> Register(RegisterDTO dto)
@@ -37,16 +40,22 @@ namespace StockApplicationApi.Services.AuthService
                 Email = dto.Email,
             };
 
+            _logger.LogInformation("Registering new user: {UserName}", user.UserName);
+
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => e.Description);
+                _logger.LogError("User registration failed for {UserName}. Errors: {Errors}", user.UserName, string.Join(", ", errors));
                 throw new OperationFailedException("Operation failed", errors);
             }
 
             // create Customer role if doesnt exist
             if (!await _roleManager.RoleExistsAsync("Customer"))
+            {
+                _logger.LogInformation("Creating 'Customer' role as it does not exist.");
                 await _roleManager.CreateAsync(new IdentityRole("Customer"));
+            }
 
             // assign default role
             await _userManager.AddToRoleAsync(user, "Customer");
@@ -61,25 +70,28 @@ namespace StockApplicationApi.Services.AuthService
 
         public async Task<AuthResponseDTO> Login(LoginDTO dto)
         {
+            _logger.LogInformation("Attempting login for email: {Email}", dto.Email);
             // find user by email
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null)
-
+            {
+                _logger.LogWarning("Login failed for email: {Email}. User not found.", dto.Email);
                 throw new NotFoundException("Invalid credentials this username might be wrong or empty");
-
+            }   
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
             if (!isPasswordValid)
             {
+                _logger.LogWarning("Login failed for email: {Email}. Invalid password.", dto.Email);
                 throw new UnAuthorizedException("Invalid credentials check if Password is wrong or empty.");
             }
-            var token = _tokenService.CreateAccessToken(user);
-
+            var token = await _tokenService.CreateAccessToken(user);
+          
             return new AuthResponseDTO
             {
                 UserName = user.UserName,
                 Email = user.Email,
-                Token = await token
+                Token =  token
             };
         }
         

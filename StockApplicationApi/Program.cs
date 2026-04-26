@@ -14,6 +14,7 @@ using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.AuthService;
 using StockApplicationApi.Services.CommentServices;
+using StockApplicationApi.Services.RedisService;
 using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Services.Token;
 using StockApplicationApi.Validators.Stocks;
@@ -63,6 +64,7 @@ builder.Services.AddScoped<IComment, CommentClass>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddSingleton<IRedisService, RedisClass>();
 
 var app = builder.Build();
 

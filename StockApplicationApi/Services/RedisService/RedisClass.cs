@@ -24,6 +24,18 @@ namespace StockApplicationApi.Services.RedisService
             return JsonSerializer.Deserialize<T>(value!)!;
         }
 
+        public async Task<bool> RemoveDataAsync(string key)
+        {
+            bool exists = await _Db.KeyExistsAsync(key);
+
+            if (exists)
+            {
+                return await _Db.KeyDeleteAsync(key);
+            }
+
+            return false;
+        }
+
         public async Task<bool> SetDataAsync<T>(string key, T data, DateTime expiration )
         {
             var expiryTimeSpan = expiration - DateTime.UtcNow;

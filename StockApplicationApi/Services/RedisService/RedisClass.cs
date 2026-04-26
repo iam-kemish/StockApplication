@@ -6,12 +6,12 @@ namespace StockApplicationApi.Services.RedisService
     public class RedisClass: IRedisService
     {
         private readonly IDatabase _Db;
-        private readonly IConfiguration configuration;
+        
         private readonly IConnectionMultiplexer _redis;
-        public RedisClass(IConfiguration configuration)
+        public RedisClass( IConnectionMultiplexer connection)
         {
-            this.configuration = configuration;
-            _redis = ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")!);
+
+            _redis = connection;
             _Db = _redis.GetDatabase(); 
         }
         public async Task<T> GetDatasAsync<T>(string key)

@@ -2,11 +2,8 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-
+using StackExchange.Redis;
 using StockApplicationApi.Database;
 using StockApplicationApi.Mapper;
 using StockApplicationApi.Models;
@@ -56,7 +53,8 @@ builder.Services.AddAuthentication(options => {
         )
     };
 });
-
+var redisConnection = builder.Configuration.GetConnectionString("RedisConnection");
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection!));
 builder.Services.AddAutoMapper(typeof(MapConfig));
 builder.Services.AddScoped<IStock, StockRepo>();
 builder.Services.AddScoped<IStockService, StockClass>();
@@ -64,7 +62,7 @@ builder.Services.AddScoped<IComment, CommentClass>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddSingleton<IRedisService, RedisClass>();
+builder.Services.AddScoped<IRedisService, RedisClass>();
 
 var app = builder.Build();
 

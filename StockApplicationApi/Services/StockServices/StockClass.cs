@@ -117,7 +117,7 @@ namespace StockApplicationApi.Services.StockServices
         public async Task<StockDTO> UpdateStock(int id, StockUpdateDTO stock)
         {           
         
-            var existingStock = await _IStock.GetStock(u => u.Id == id);
+            var existingStock = await _IStock.GetStockForUpdate(id);
             if (existingStock == null)
             {
                 _logger.LogWarning("Attempt to update a non-existent stock with ID: {StockId}", id);
@@ -132,7 +132,7 @@ namespace StockApplicationApi.Services.StockServices
             existingStock.CompanyName = stock.CompanyName;
             existingStock.Symbol = stock.Symbol;
 
-            await _IStock.UpdateStock(existingStock);
+            await _IStock.UpdateStock();
             await _cache.RemoveDataAsync($"{cacheKey}_{id}");
             await _cache.RemoveDataAsync(cacheKey);
             _logger.LogInformation("Stock with ID: {StockId} updated successfully", id);

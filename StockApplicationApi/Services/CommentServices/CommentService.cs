@@ -58,7 +58,7 @@ namespace StockApplicationApi.Services.CommentServices
 
         public async Task<CommentDto> UpdateComment(int id, CommentUpdateDTO comment)
         {
-            var existingComment = await _IComment.GetComment(u => u.Id == id);
+            var existingComment = await _IComment.GetCommentForUpdate(id);
             if (existingComment == null)
             {
                 _logger.LogWarning("Attempt to update non-existing comment with id: {CommentId}", id);
@@ -70,7 +70,7 @@ namespace StockApplicationApi.Services.CommentServices
             existingComment.Content = comment.Content;
             
 
-            await _IComment.UpdateComment(existingComment);
+            await _IComment.UpdateComment();
             _logger.LogInformation("Comment with id: {CommentId} updated successfully", id);
 
             return _IMapper.Map<CommentDto>(existingComment);

@@ -11,7 +11,8 @@ namespace StockApplicationApi.Repositary.StockRepositary
   
         Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null);
         Task AddStock(Stock Stock);
-        Task UpdateStock(Stock Stock);
+        Task<Stock?> GetStockForUpdate(int id);
+        Task UpdateStock(); 
         Task DeleteStock(Stock Stock);
         Task<bool> StockExists(int? id);
     }

@@ -65,14 +65,18 @@ namespace StockApplicationApi.Repositary.StockRepositary
             return query.FirstOrDefaultAsync();
         }
 
+        public async Task<Stock?> GetStockForUpdate(int id)
+        {
+          return await _Db.Stocks.FindAsync(id);
+        }
+
         public Task<bool> StockExists(int? id)
         {
             return _Db.Stocks.AnyAsync(u => u.Id == id);
         }
 
-        public async Task UpdateStock(Stock Stock)
+        public async Task UpdateStock()
         {
-            _Db.Stocks.Update(Stock);
            await _Db.SaveChangesAsync();
         }
     }

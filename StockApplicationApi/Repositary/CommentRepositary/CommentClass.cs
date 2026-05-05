@@ -39,10 +39,17 @@ namespace StockApplicationApi.Repositary.CommentRepositary
             return query.FirstOrDefaultAsync();
         }
 
-        public async Task UpdateComment(Comment comment)
+       
+        public async Task<Comment?> GetCommentForUpdate(int id)
         {
-            _context.Comments.Update(comment);
+            return await _context.Comments.FindAsync(id);
+        }
+
+        public async Task UpdateComment()
+        {
             await _context.SaveChangesAsync();
         }
+
+       
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using StockApplicationApi.Exceptions;
+
 using StockApplicationApi.Helpers;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.StockDTOs;
@@ -73,7 +74,8 @@ namespace StockApplicationApi.Services.StockServices
 
         public async Task<IEnumerable<StockDTO>> GetAllStocks(StockQuery stockQuery)
         {
-            var cachedStocks = await _cache.GetDatasAsync<IEnumerable<StockDTO>>(cacheKey);
+            string GetCachekey = GenerateCacheKey(stockQuery);
+            var cachedStocks = await _cache.GetDatasAsync<IEnumerable<StockDTO>>(GetCachekey);
             if (cachedStocks != null)
             {
                 _logger.LogInformation("Retrieved all stocks from cache");
@@ -82,8 +84,13 @@ namespace StockApplicationApi.Services.StockServices
 
             var stocks = await _IStock.GetAllStocks(stockQuery);
             _logger.LogInformation("Retrieved all stocks");
-            await _cache.SetDataAsync(cacheKey, _IMapper.Map<IEnumerable<StockDTO>>(stocks), DateTime.UtcNow.AddMinutes(5));
+            await _cache.SetDataAsync(GetCachekey, _IMapper.Map<IEnumerable<StockDTO>>(stocks), DateTime.UtcNow.AddMinutes(5));
             return _IMapper.Map<IEnumerable<StockDTO>>(stocks);
+        }
+
+        private string GenerateCacheKey(StockQuery query)
+        {
+            return $"stocks_p{query.PageNumber}_s{query.PageSize}_name:{query.CompanyName}_sym:{query.Symbol}_sort:{query.SortBy}";
         }
 
         public async Task<StockDTO> GetStockById(int id)

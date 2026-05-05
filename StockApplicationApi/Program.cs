@@ -14,6 +14,7 @@ using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Services.RedisService;
 using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Services.Token;
+using StockApplicationApi.Validators.Auth;
 using StockApplicationApi.Validators.Stocks;
 using System.Text;
 
@@ -26,6 +27,8 @@ builder.Services.AddOpenApi();
 // FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<StockCreateDtoValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<StockUpdateDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+
 
 // Database & Identity
 builder.Services.AddDbContext<AppDbContext>(options =>

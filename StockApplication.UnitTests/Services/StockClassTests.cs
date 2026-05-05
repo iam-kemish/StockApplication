@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
@@ -22,8 +21,6 @@ namespace StockApplicationApi.UnitTests.Services
             _mockRepo = new Mock<IStock>();
             _service = new StockClass(_mockRepo.Object, _mockMapper.Object);
         }
-
-
 
         // TEST 1 — company name duplicate → throws
         [Fact]

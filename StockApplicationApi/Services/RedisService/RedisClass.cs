@@ -14,6 +14,7 @@ namespace StockApplicationApi.Services.RedisService
             _redis = connection;
             _Db = _redis.GetDatabase(); 
         }
+    
         public async Task<T> GetDatasAsync<T>(string key)
         {
            var value =await _Db.StringGetAsync(key);

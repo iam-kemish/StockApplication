@@ -37,17 +37,11 @@ namespace StockApplicationApi.Services.RedisService
             return false;
         }
 
-        public async Task<bool> SetDataAsync<T>(string key, T data, DateTime expiration )
+        public async Task<bool> SetDataAsync<T>(string key, T data, TimeSpan expiration )
         {
-            var expiryTimeSpan = expiration - DateTime.UtcNow;
-     
-            if (expiryTimeSpan.TotalSeconds <= 0)
-            {
-                return false;
-            }
-
+           
             var jsonData = JsonSerializer.Serialize(data);
-            return await _Db.StringSetAsync(key, jsonData, expiryTimeSpan);
+            return await _Db.StringSetAsync(key, jsonData, expiration);
         } 
     }
 }

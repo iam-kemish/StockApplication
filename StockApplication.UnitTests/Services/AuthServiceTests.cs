@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Castle.Core.Logging;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Moq;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
 using StockApplicationApi.Services.AuthService;
+using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Services.Token;
 
 namespace StockApplication.UnitTests.Services
@@ -14,6 +17,7 @@ namespace StockApplication.UnitTests.Services
         private readonly Mock<RoleManager<IdentityRole>> _roleManagerMock;
         private readonly Mock<ITokenService> _tokenServiceMock;
         private readonly AuthService _sut;
+        private readonly Mock<ILogger<AuthService>> _mockLogger;
         public AuthServiceTests()
         {
             _userManagerMock = new Mock<UserManager<AppUser>>(
@@ -21,7 +25,8 @@ namespace StockApplication.UnitTests.Services
             _roleManagerMock = new Mock<RoleManager<IdentityRole>>(
                 Mock.Of<IRoleStore<IdentityRole>>(), null, null, null, null);
             _tokenServiceMock = new Mock<ITokenService>();
-            _sut = new AuthService(_userManagerMock.Object, _roleManagerMock.Object, _tokenServiceMock.Object);
+            _mockLogger = new Mock<ILogger<AuthService>>();
+            _sut = new AuthService(_userManagerMock.Object, _roleManagerMock.Object, _tokenServiceMock.Object, _mockLogger.Object);
         }
         [Fact]
         public async Task Register_ShouldThrowConflictException_WhenEmailAlreadyExists()
@@ -151,7 +156,7 @@ namespace StockApplication.UnitTests.Services
             _userManagerMock.Setup(um => um.CheckPasswordAsync(user, dto.Password))
                 .ReturnsAsync(false);
             var ex = await Assert.ThrowsAsync<UnAuthorizedException>(() => _sut.Login(dto));
-            Assert.Equal("Invalid credentials this password might be wrong or empty", ex.Message);
+            Assert.Equal("Invalid credentials check if Password is wrong or empty.", ex.Message);
         }
         [Fact]
         public async Task Login_ShouldReturnAuthResponseDTO_WhenCredentialsAreValid()

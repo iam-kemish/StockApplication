@@ -41,10 +41,7 @@ namespace StockApplicationApi.Services.StockServices
                     conflictDetail = $"Company Name '{stock.CompanyName}'";
                 else if (existing.Symbol.Equals(stock.Symbol, StringComparison.OrdinalIgnoreCase))
                     conflictDetail = $"Symbol '{stock.Symbol}'";
-                else if (existing.Industry.Equals(stock.Industry, StringComparison.OrdinalIgnoreCase))
-                    conflictDetail = $"Industry '{stock.Industry}'";
-
-               
+                
                 _logger.LogWarning("Conflict detected: {ConflictDetail}", conflictDetail);
 
              
@@ -84,7 +81,7 @@ namespace StockApplicationApi.Services.StockServices
 
             var stocks = await _IStock.GetAllStocks(stockQuery);
             _logger.LogInformation("Retrieved all stocks");
-            await _cache.SetDataAsync(GetCachekey, _IMapper.Map<IEnumerable<StockDTO>>(stocks), DateTime.UtcNow.AddMinutes(5));
+            await _cache.SetDataAsync(GetCachekey, _IMapper.Map<IEnumerable<StockDTO>>(stocks), TimeSpan.FromMinutes(5));
             return _IMapper.Map<IEnumerable<StockDTO>>(stocks);
         }
 
@@ -110,7 +107,7 @@ namespace StockApplicationApi.Services.StockServices
                 _logger.LogWarning("Attempt to retrieve a non-existent stock with ID: {StockId}", id);
                 throw new NotFoundException("Does this Stock exists?");
             }
-            await _cache.SetDataAsync($"{cacheKey}_{id}", _IMapper.Map<StockDTO>(stock), DateTime.UtcNow.AddMinutes(5));
+            await _cache.SetDataAsync($"{cacheKey}_{id}", _IMapper.Map<StockDTO>(stock), TimeSpan.FromMinutes(5));
             return _IMapper.Map<StockDTO>(stock);
         }
 

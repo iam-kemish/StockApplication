@@ -61,7 +61,7 @@ namespace StockApplicationApi.Controllers
 
                     );
             }
-            var createdComment =await _IComment.AddComment(dto);
+            var createdComment =await _IComment.AddComment(dto, dto.StockId);
 
             return Ok(new APIResponse
             {

@@ -24,18 +24,20 @@ namespace StockApplicationApi.Services.CommentServices
             _logger = logger;
         
         }
-        public async Task<CommentDto> AddComment(CreateComment comment)
+        public async Task<CommentDto> AddComment(CreateComment comment, int stockId)
         {
-         if ( !await _IStock.StockExists(comment.StockId))
+         if ( !await _IStock.StockExists(stockId))
             {
-                _logger.LogWarning("Attempt to add comment for non-existing stockId: {StockId}", comment.StockId);
+                _logger.LogWarning("Attempt to add comment for non-existing stockId: {StockId}", stockId);
                 throw new ConflictException("This stock doesnt exist in stock database");
             }
             var createdComment = _IMapper.Map<Comment>(comment);
+            createdComment.StockId = stockId;
             await _IComment.AddComment(createdComment);
-            _logger.LogInformation("Comment added for stockId: {StockId}", comment.StockId);
+            _logger.LogInformation("Comment added for stockId: {StockId}", stockId);
             return _IMapper.Map<CommentDto>(createdComment);
         }
+
 
         public async Task<IEnumerable<CommentDto>> GetAllComments()
         {

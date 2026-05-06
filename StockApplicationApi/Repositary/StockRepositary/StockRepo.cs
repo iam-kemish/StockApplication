@@ -31,11 +31,11 @@ namespace StockApplicationApi.Repositary.StockRepositary
             var query = _Db.Stocks.Include(p => p.Comments).AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(stockQuery.CompanyName))
             {
-                query = query.Where(u => u.CompanyName.ToLower().Contains(stockQuery.CompanyName.ToLower()));
+                query = query.Where(u => EF.Functions.Like(u.CompanyName, $"%{stockQuery.CompanyName}%"));
             }
             if (!string.IsNullOrWhiteSpace(stockQuery.Symbol))
             {
-                query = query.Where(u => u.Symbol.ToLower().Contains(stockQuery.Symbol.ToLower()));
+                query = query.Where(u => EF.Functions.Like(u.Symbol, $"%{stockQuery.Symbol}%"));
             }
             if (!string.IsNullOrWhiteSpace(stockQuery.SortBy))
             {
@@ -70,7 +70,7 @@ namespace StockApplicationApi.Repositary.StockRepositary
           return await _Db.Stocks.FindAsync(id);
         }
 
-        public Task<bool> StockExists(int? id)
+        public Task<bool> StockExists(int id)
         {
             return _Db.Stocks.AnyAsync(u => u.Id == id);
         }

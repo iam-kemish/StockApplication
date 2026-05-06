@@ -14,6 +14,6 @@ namespace StockApplicationApi.Repositary.StockRepositary
         Task<Stock?> GetStockForUpdate(int id);
         Task UpdateStock(); 
         Task DeleteStock(Stock Stock);
-        Task<bool> StockExists(int? id);
+        Task<bool> StockExists(int id);
     }
 }

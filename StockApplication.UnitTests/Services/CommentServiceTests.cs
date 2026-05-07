@@ -8,7 +8,6 @@ using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.CommentServices;
-using System.Linq.Expressions;
 
 namespace StockApplication.UnitTests.Services
 {

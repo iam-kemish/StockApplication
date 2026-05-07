@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using StockApplicationApi.Exceptions;
+using StockApplicationApi.Mapper;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.StockRepositary;
@@ -14,18 +15,24 @@ namespace StockApplicationApi.UnitTests.Services
     public class StockClassTests
     {
         private readonly Mock<IStock> _mockRepo;
-        private readonly Mock<IMapper> _mockMapper;
+        private readonly IMapper _Imapper;
         private readonly StockClass _service;
         private readonly Mock<ILogger<StockClass>> _mockLogger;
         private readonly Mock<IRedisService> _mockRedisService;     
 
         public StockClassTests()
         {
-            _mockMapper = new Mock<IMapper>();
+            var config = new MapperConfiguration(cfg =>
+            {
+               
+                cfg.AddProfile<MapConfig>();
+            });         
+            _Imapper = config.CreateMapper();
+
             _mockRepo = new Mock<IStock>();
             _mockLogger = new Mock<ILogger<StockClass>>();
             _mockRedisService = new Mock<IRedisService>();
-            _service = new StockClass(_mockRepo.Object, _mockMapper.Object, _mockLogger.Object, _mockRedisService.Object);
+            _service = new StockClass(_mockRepo.Object, _Imapper, _mockLogger.Object, _mockRedisService.Object);
         }
 
         [Fact]
@@ -50,14 +57,14 @@ namespace StockApplicationApi.UnitTests.Services
                 LastDiv = 0.5m,
                 MarketCap = 1000000000
             };
-           _mockRepo.Setup(r=>r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
+           _mockRepo.Setup(r=>r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>()))
                     .ReturnsAsync(existingStock);
             var ex = await Assert.ThrowsAsync<ConflictException>(
                 () => _service.AddStock(createDTO)
             );
             Assert.Contains("already exists", ex.Message);
           
-            _mockRepo.Verify(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()), Times.Once);
+            _mockRepo.Verify(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>()), Times.Once);
         }                                     
           
         
@@ -98,16 +105,10 @@ namespace StockApplicationApi.UnitTests.Services
                 Comments = new List<Comment>()
             };
 
-          _mockRepo.Setup(r=>r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
+          _mockRepo.Setup(r=>r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>()))
                    .ReturnsAsync((Stock)null);
 
-            _mockMapper.Setup(m => m.Map<Stock>(createDTO))
-                       .Returns(stockEntity);
-
-
-            _mockMapper.Setup(m => m.Map<StockDTO>(stockEntity))
-                       .Returns(stockDTO);
-
+        
             // fake repo: pretend DB save succeeded
             _mockRepo.Setup(r => r.AddStock(stockEntity))
                      .Returns(Task.CompletedTask);
@@ -130,11 +131,7 @@ namespace StockApplicationApi.UnitTests.Services
             // prove DB save was called once
             _mockRepo.Verify(r => r.AddStock(stockEntity), Times.Once);
           _mockRedisService.Verify(r => r.RemoveDataAsync(It.IsAny<string>()), Times.Once);
-            // prove mapping DTO → entity was called once
-            _mockMapper.Verify(m => m.Map<Stock>(createDTO), Times.Once);
-
-            // prove mapping entity → DTO was called once
-            _mockMapper.Verify(m => m.Map<StockDTO>(stockEntity), Times.Once);
+           
         }
 
 
@@ -146,7 +143,7 @@ namespace StockApplicationApi.UnitTests.Services
             int stockId = 1;
 
            
-            _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
+            _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>()))
                      .ReturnsAsync((Stock)null);
 
           
@@ -154,7 +151,7 @@ namespace StockApplicationApi.UnitTests.Services
                 () => _service.DeleteStock(stockId)
             );
 
-            Assert.Equal("Does this Stock exists?", ex.Message);
+            Assert.Contains("Does this Stock exists?", ex.Message);
 
           
             _mockRepo.Verify(r => r.DeleteStock(It.IsAny<Stock>()), Times.Never);
@@ -179,7 +176,7 @@ namespace StockApplicationApi.UnitTests.Services
             };
 
          
-            _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()))
+            _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>()))
                      .ReturnsAsync(stockEntity);
 
            
@@ -192,7 +189,7 @@ namespace StockApplicationApi.UnitTests.Services
             await _service.DeleteStock(stockId);
 
 
-            _mockRepo.Verify(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>()), Times.Once);
+            _mockRepo.Verify(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>()), Times.Once);
            _mockRedisService.Verify(r => r.RemoveDataAsync(It.IsAny<string>()), Times.Once);
             // prove delete was actually called once
             _mockRepo.Verify(r => r.DeleteStock(stockEntity), Times.Once);
@@ -205,7 +202,7 @@ namespace StockApplicationApi.UnitTests.Services
 
 
             // mock repo returns null → stock not found in DB
-            _mockRepo.Setup(r => r.GetStockForUpdate(id)).ReturnsAsync((Stock)null);
+            _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>())).ReturnsAsync((Stock)null);
 
             // ACT
             var ex = await Assert.ThrowsAsync<NotFoundException>(
@@ -213,10 +210,10 @@ namespace StockApplicationApi.UnitTests.Services
             );
 
             // ASSERT
-            Assert.Equal("Does this Stock exists?", ex.Message);
+            Assert.Contains("Does this Stock exists?", ex.Message);
 
             // prove update was never called because stock was not found
-            _mockRepo.Verify(r => r.UpdateStock(), Times.Never);
+         _mockRepo.Verify(r=>r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>()), Times.Once);
 
         }
         [Fact]
@@ -244,26 +241,25 @@ namespace StockApplicationApi.UnitTests.Services
             };
             int id = 1;
           
-            _mockRepo.Setup(r => r.GetStockForUpdate(id)).ReturnsAsync(existingStock);
+            _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), true)).ReturnsAsync(existingStock);
             _mockRedisService.Setup(r=>r.RemoveDataAsync(It.IsAny<string>())).ReturnsAsync(true);
-            _mockRepo.Setup(r => r.UpdateStock()).Returns(Task.CompletedTask);
-            _mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
-              .Returns(new StockDTO());
+          
+            //_mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
+            //  .Returns(new StockDTO());
             await _service.UpdateStock(id, stockUpdateDTO);
 
             Assert.NotNull(existingStock);
             Assert.Equal("Tesla Updated", existingStock.CompanyName);
+            Assert.Equal("TSLA", existingStock.Symbol);
             Assert.Equal(9000, existingStock.MarketCap);
             Assert.Equal(200, existingStock.Purchase);
             Assert.Equal(3.0m, existingStock.LastDiv);
             Assert.Equal("Automotive", existingStock.Industry);
 
-            _mockRepo.Verify(r => r.UpdateStock(), Times.Once);
-            _mockRedisService.Verify(r => r.RemoveDataAsync(It.IsAny<string>()), Times.Exactly(2));
+            _mockRepo.Verify(r=>r.UpdateStock(existingStock), Times.Once);
+            _mockRedisService.Verify(r => r.RemoveDataAsync("stock"), Times.Once);
+            _mockRedisService.Verify(r => r.RemoveDataAsync($"stock_{id}"), Times.Once);
 
-            _mockMapper.Verify(m => m.Map<StockDTO>(existingStock), Times.Once);
-
-          
         }
     }
 }

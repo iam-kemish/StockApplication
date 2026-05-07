@@ -66,6 +66,7 @@ namespace StockApplicationApi.Services.StockServices
             await _IStock.DeleteStock(stock);
            
             await _cache.RemoveDataAsync(cacheKey); 
+            await _cache.RemoveDataAsync($"{cacheKey}_{id}");
             _logger.LogInformation("Cache removed successfully after deleting stock with ID: {StockId}", id);
         }
 
@@ -114,22 +115,15 @@ namespace StockApplicationApi.Services.StockServices
         public async Task<StockDTO> UpdateStock(int id, StockUpdateDTO stock)
         {           
         
-            var existingStock = await _IStock.GetStockForUpdate(id);
+            var existingStock = await _IStock.GetStock(u => u.Id == id, tracking: true);
             if (existingStock == null)
             {
                 _logger.LogWarning("Attempt to update a non-existent stock with ID: {StockId}", id);
                 throw new NotFoundException("Does this Stock exists?");
             }
-
-           
-            existingStock.MarketCap = stock.MarketCap;
-            existingStock.Purchase = stock.Purchase;
-            existingStock.LastDiv = stock.LastDiv;
-            existingStock.Industry = stock.Industry;
-            existingStock.CompanyName = stock.CompanyName;
-            existingStock.Symbol = stock.Symbol;
-
-            await _IStock.UpdateStock();
+            _IMapper.Map(stock, existingStock);
+          
+            await _IStock.UpdateStock(existingStock);
             await _cache.RemoveDataAsync($"{cacheKey}_{id}");
             await _cache.RemoveDataAsync(cacheKey);
             _logger.LogInformation("Stock with ID: {StockId} updated successfully", id);

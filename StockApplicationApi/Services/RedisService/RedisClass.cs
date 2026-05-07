@@ -27,14 +27,9 @@ namespace StockApplicationApi.Services.RedisService
 
         public async Task<bool> RemoveDataAsync(string key)
         {
-            bool exists = await _Db.KeyExistsAsync(key);
-
-            if (exists)
-            {
-                return await _Db.KeyDeleteAsync(key);
-            }
-
-            return false;
+           
+         return await _Db.KeyDeleteAsync(key);
+            
         }
 
         public async Task<bool> SetDataAsync<T>(string key, T data, TimeSpan expiration )

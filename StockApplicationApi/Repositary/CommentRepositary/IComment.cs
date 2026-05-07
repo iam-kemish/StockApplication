@@ -7,9 +7,9 @@ namespace StockApplicationApi.Repositary.CommentRepositary
     {
         Task<IEnumerable<Comment>> GetAllComments(Expression<Func<Comment, bool>>? filter = null);
 
-        Task<Comment?> GetComment(Expression<Func<Comment, bool>>? filter = null);
+        Task<Comment?> GetComment(Expression<Func<Comment, bool>>? filter = null, bool tracking = false);
         Task AddComment(Comment comment);
-        Task<Comment?> GetCommentForUpdate(int id);
-        Task UpdateComment();
+       
+        Task UpdateComment(Comment comment);
     }
 }

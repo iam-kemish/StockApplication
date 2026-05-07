@@ -29,9 +29,13 @@ namespace StockApplicationApi.Repositary.CommentRepositary
             return await query.ToListAsync();
         }
 
-        public Task<Comment?> GetComment(Expression<Func<Comment, bool>>? filter = null)
+        public Task<Comment?> GetComment(Expression<Func<Comment, bool>>? filter = null, bool tracking = false)
         {
             var query = _context.Comments.AsNoTracking().AsQueryable();
+            if (!tracking)
+            {
+                query = _context.Comments.AsQueryable();
+            }
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -39,17 +43,11 @@ namespace StockApplicationApi.Repositary.CommentRepositary
             return query.FirstOrDefaultAsync();
         }
 
-       
-        public async Task<Comment?> GetCommentForUpdate(int id)
+        public async Task UpdateComment(Comment comment)
         {
-            return await _context.Comments.FindAsync(id);
-        }
+           _context.Comments.Update(comment);
+           await _context.SaveChangesAsync();
 
-        public async Task UpdateComment()
-        {
-            await _context.SaveChangesAsync();
         }
-
-       
     }
 }

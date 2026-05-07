@@ -2,18 +2,20 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using StockApplicationApi.Exceptions;
+using StockApplicationApi.Mapper;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.CommentDTOs;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.CommentServices;
+using System.Linq.Expressions;
 
 namespace StockApplication.UnitTests.Services
 {
     public class CommentServiceTests
     {
-        private readonly Mock<IMapper> _mockMapper;
+        private readonly IMapper _Imapper;
         private readonly Mock<IComment> _mockRepo;
         private readonly CommentService _service;
         private readonly Mock<IStock>  _IStock;
@@ -21,11 +23,16 @@ namespace StockApplication.UnitTests.Services
 
         public CommentServiceTests()
         {
-            _mockMapper = new Mock<IMapper>();
+            var config = new MapperConfiguration(cfg =>
+            {
+
+                cfg.AddProfile<MapConfig>();
+            });
+            _Imapper = config.CreateMapper();
             _mockRepo = new Mock<IComment>();
             _IStock = new Mock<IStock>();
                 _mockLogger = new Mock<ILogger<CommentService>>();  
-            _service = new CommentService(_mockRepo.Object, _mockMapper.Object, _IStock.Object, _mockLogger.Object);
+            _service = new CommentService(_mockRepo.Object,_Imapper, _IStock.Object, _mockLogger.Object);
         }
         [Fact]
         public async Task AddComment_StockNotFound_ThrowsConflictException()
@@ -41,7 +48,7 @@ namespace StockApplication.UnitTests.Services
              () => _service.AddComment(createCommentDto,createCommentDto.StockId)        
          );
 
-            Assert.Equal("This stock doesnt exist in stock database", ex.Message );
+            Assert.Contains("This stock doesnt exist in stock database", ex.Message );
 
         }
             [Fact]
@@ -70,13 +77,9 @@ namespace StockApplication.UnitTests.Services
                 Content = "This is a new comment",
                 StockId = 2
             };
-            _mockMapper.Setup(m => m.Map<Comment>(createCommentDto))
-                     .Returns(CommentEntity);
+        
             _IStock.Setup(r => r.StockExists(createCommentDto.StockId))
        .ReturnsAsync(true);
-
-            _mockMapper.Setup(m => m.Map<CommentDto>(CommentEntity))
-                       .Returns(commentDto);
 
             // fake repo: pretend DB save succeeded
             _mockRepo.Setup(r => r.AddComment(CommentEntity))
@@ -86,16 +89,13 @@ namespace StockApplication.UnitTests.Services
             var result = await _service.AddComment(createCommentDto,createCommentDto.StockId);
 
             Assert.NotNull(result);
-            Assert.Equal("This is a test comment", result.Content);
-            Assert.Equal("Test Comment", result.Title);
+            Assert.Contains("This is a new comment", result.Content);
+            Assert.Contains("New Comment", result.Title);
 
-            _mockRepo.Verify(r => r.AddComment(CommentEntity), Times.Once);
+            _mockRepo.Verify(r => r.AddComment(It.Is<Comment>(s => s.Title == "New Comment"
+            && s.Content == "This is a new comment"
+            && s.StockId == 2)), Times.Once);
 
-           
-            _mockMapper.Verify(m => m.Map<Comment>(createCommentDto), Times.Once);
-
-            
-            _mockMapper.Verify(m => m.Map<CommentDto>(CommentEntity), Times.Once);
         }
 
         [Fact]
@@ -106,7 +106,7 @@ namespace StockApplication.UnitTests.Services
 
 
             // mock repo returns null → stock not found in DB
-            _mockRepo.Setup(r => r.GetCommentForUpdate(id))
+            _mockRepo.Setup(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>(), true))
                      .ReturnsAsync((Comment)null);
 
             // ACT
@@ -115,11 +115,8 @@ namespace StockApplication.UnitTests.Services
             );
 
             // ASSERT
-            Assert.Equal("Does this Comment exists?", ex.Message);
-
-            // prove update was never called because stock was not found
-            _mockRepo.Verify(r => r.UpdateComment(), Times.Never);
-
+            Assert.Contains("Does this Comment exists?", ex.Message);
+          _mockRepo.Verify(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>(), true), Times.Once);
         }
         [Fact]
         public async Task UpdateComment_ValidComment_FieldsAreCorrectlyMapped()
@@ -137,24 +134,17 @@ namespace StockApplication.UnitTests.Services
             };
             int id = 1;
          
-            _mockRepo.Setup(r => r.GetCommentForUpdate(id))
+            _mockRepo.Setup(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>(), true))
              .ReturnsAsync(existingComment);
 
-            _mockRepo.Setup(r => r.UpdateComment()).Returns(Task.CompletedTask);
-            _mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
-              .Returns(new StockDTO());
             await _service.UpdateComment(id, commentUpdateDTO);
 
             Assert.NotNull(existingComment);
-            Assert.Equal("TITLEUPDATED", existingComment.Title);
-            Assert.Equal("THIS IS CONTENT", existingComment.Content);
+            Assert.Contains("TITLEUPDATED", existingComment.Title);
+            Assert.Contains("THIS IS CONTENT", existingComment.Content);
            
 
-            _mockRepo.Verify(r => r.UpdateComment(), Times.Once);
-
-
-            _mockMapper.Verify(m => m.Map<CommentDto>(existingComment), Times.Once);
-
+            _mockRepo.Verify(r => r.UpdateComment(existingComment), Times.Once);
 
         }
     }

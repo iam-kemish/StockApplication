@@ -9,6 +9,7 @@ using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.CommentServices;
+using StockApplicationApi.Services.RedisService;
 using System.Linq.Expressions;
 
 namespace StockApplication.UnitTests.Services
@@ -20,6 +21,7 @@ namespace StockApplication.UnitTests.Services
         private readonly CommentService _service;
         private readonly Mock<IStock>  _IStock;
         private readonly Mock<ILogger<CommentService>> _mockLogger;
+        private readonly Mock<IRedisService> _mockRedisService;
 
         public CommentServiceTests()
         {
@@ -31,8 +33,9 @@ namespace StockApplication.UnitTests.Services
             _Imapper = config.CreateMapper();
             _mockRepo = new Mock<IComment>();
             _IStock = new Mock<IStock>();
-                _mockLogger = new Mock<ILogger<CommentService>>();  
-            _service = new CommentService(_mockRepo.Object,_Imapper, _IStock.Object, _mockLogger.Object);
+                _mockLogger = new Mock<ILogger<CommentService>>();
+            _mockRedisService = new Mock<IRedisService>();
+            _service = new CommentService(_mockRepo.Object,_Imapper, _IStock.Object, _mockLogger.Object, _mockRedisService.Object);
         }
         [Fact]
         public async Task AddComment_StockNotFound_ThrowsConflictException()

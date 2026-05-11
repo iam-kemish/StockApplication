@@ -11,6 +11,7 @@ namespace StockApplication.UnitTests.Services
     public class TokenServiceTests
     {
         private readonly Mock<UserManager<AppUser>> _userManagerMock;
+        private readonly IConfiguration _config;
         private readonly TokenService _sut;
         public TokenServiceTests()
         {
@@ -18,28 +19,28 @@ namespace StockApplication.UnitTests.Services
                 Mock.Of<IUserStore<AppUser>>(), null, null, null, null, null, null, null, null);
             var inMemorySettings = new Dictionary<string, string>
         {
-            { "Jwt:SecretKey", "this-is-a-very-long-secret-key-for-testing-1234!" },
-            { "Jwt:Issuer", "https://localhost:7268/" },
-            { "Jwt:Audience", "https://localhost:7268/" }
+            { "JWT:SigningKey", "this-is-a-very-long-secret-key-for-testing-1234!" },
+            { "JWT:Issuer", "Issuer" },
+            { "JWT:Audience", "Audience" }
         };
-            var config = new ConfigurationBuilder()
+            _config = new ConfigurationBuilder()
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            _sut = new TokenService(config, _userManagerMock.Object);
+            _sut = new TokenService(_config, _userManagerMock.Object);
         }
         [Fact]
         public async Task CreateAccessToken_ShouldIncludeRoles()
         {
             var user = new AppUser
             {
-                Id = "1",
+                Id = "user123",
                 UserName = "kemish",
                 Email = "kem@gmail.com"
             };
 
             _userManagerMock
-                .Setup(x => x.GetRolesAsync(It.IsAny<AppUser>()))
+                .Setup(x => x.GetRolesAsync(user))
                 .ReturnsAsync(new List<string> { "Customer" });
 
             var token = await _sut.CreateAccessToken(user);
@@ -58,13 +59,13 @@ namespace StockApplication.UnitTests.Services
         {
             var user = new AppUser
             {
-                Id = "1",
+                Id = "user123",
                 UserName = "kemish",
                 Email = "kem@gmail.com"
             };
 
             _userManagerMock
-                .Setup(x => x.GetRolesAsync(It.IsAny<AppUser>()))
+                .Setup(x => x.GetRolesAsync(user))
                 .ReturnsAsync(new List<string>());
 
             var token = await _sut.CreateAccessToken(user);
@@ -73,30 +74,14 @@ namespace StockApplication.UnitTests.Services
             var jwt = handler.ReadJwtToken(token);
 
             Assert.Contains(jwt.Claims, c =>
-                c.Type == "nameid" && c.Value == user.Id);
+                c.Type == JwtRegisteredClaimNames.Sub && c.Value == user.Id);
 
             Assert.Contains(jwt.Claims, c =>
-                c.Type == "unique_name" && c.Value == user.UserName);
+                c.Type == JwtRegisteredClaimNames.UniqueName && c.Value == user.UserName);
 
             Assert.Contains(jwt.Claims, c =>
-                c.Type == "email" && c.Value == user.Email);
+                c.Type == JwtRegisteredClaimNames.Email && c.Value == user.Email);
         }
-        [Fact]
-        public async Task CreateAccessToken_ShouldReturnValidToken()
-        {
-            var user = new AppUser
-            {
-                Id = "1",
-                UserName = "kemish",
-                Email = "kem@gmail.com"
-            };
-            _userManagerMock
-           .Setup(um => um.GetRolesAsync(It.IsAny<AppUser>()))
-           .ReturnsAsync(new List<string> { "Customer" });
-            var token = await _sut.CreateAccessToken(user);
-            var handler = new JwtSecurityTokenHandler();
-            var jwt = handler.ReadJwtToken(token);
-            Assert.NotNull(jwt);
-        }
+       
     }
 }

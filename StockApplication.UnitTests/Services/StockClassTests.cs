@@ -9,6 +9,7 @@ using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.RedisService;
 using StockApplicationApi.Services.StockServices;
 using System.Linq.Expressions;
+using static StockApplicationApi.Helpers.RedisCacheStrings;
 
 namespace StockApplicationApi.UnitTests.Services
 {
@@ -112,8 +113,8 @@ namespace StockApplicationApi.UnitTests.Services
             // fake repo: pretend DB save succeeded
             _mockRepo.Setup(r => r.AddStock(stockEntity))
                      .Returns(Task.CompletedTask);
-            _mockRedisService.Setup(r => r.RemoveDataAsync(It.IsAny<string>()))
-                 .ReturnsAsync(true);
+            _mockRedisService.Setup(r => r.RemoveByPrefixAsync(It.IsAny<string>()))
+                 .Returns(Task.CompletedTask);
 
             // ACT
             var result = await _service.AddStock(createDTO);
@@ -136,7 +137,7 @@ namespace StockApplicationApi.UnitTests.Services
             && s.LastDiv == 0.5m
             && s.MarketCap == 1000000000)), Times.Once);
 
-          _mockRedisService.Verify(r => r.RemoveDataAsync(It.IsAny<string>()), Times.Once);
+          _mockRedisService.Verify(r => r.RemoveByPrefixAsync(It.IsAny<string>()), Times.Once);
            
         }
 
@@ -191,16 +192,18 @@ namespace StockApplicationApi.UnitTests.Services
 
             _mockRedisService.Setup(r => r.RemoveDataAsync(It.IsAny<string>()))
                  .ReturnsAsync(true);
-    
+            _mockRedisService.Setup(r => r.RemoveByPrefixAsync(It.IsAny<string>()))
+                 .Returns(Task.CompletedTask);
+
             await _service.DeleteStock(stockId);
 
 
             _mockRepo.Verify(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), It.IsAny<bool>()), Times.Once);
             // Verify the list cache was cleared
-            _mockRedisService.Verify(r => r.RemoveDataAsync("stock"), Times.Once);
+            _mockRedisService.Verify(r => r.RemoveByPrefixAsync(CacheKeys.StockList), Times.Once);
 
             // Verify the specific item cache was cleared
-            _mockRedisService.Verify(r => r.RemoveDataAsync($"stock_{stockId}"), Times.Once);
+            _mockRedisService.Verify(r => r.RemoveDataAsync(CacheKeys.StockDetail(stockId)), Times.Once);
             // prove delete was actually called once
             _mockRepo.Verify(r => r.DeleteStock(stockEntity), Times.Once);
         }
@@ -253,7 +256,7 @@ namespace StockApplicationApi.UnitTests.Services
           
             _mockRepo.Setup(r => r.GetStock(It.IsAny<Expression<Func<Stock, bool>>>(), true)).ReturnsAsync(existingStock);
             _mockRedisService.Setup(r=>r.RemoveDataAsync(It.IsAny<string>())).ReturnsAsync(true);
-          
+            _mockRedisService.Setup(r=>r.RemoveByPrefixAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
             //_mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
             //  .Returns(new StockDTO());
             await _service.UpdateStock(id, stockUpdateDTO);
@@ -267,8 +270,8 @@ namespace StockApplicationApi.UnitTests.Services
             Assert.Equal("Automotive", existingStock.Industry);
 
             _mockRepo.Verify(r=>r.UpdateStock(existingStock), Times.Once);
-            _mockRedisService.Verify(r => r.RemoveDataAsync("stock"), Times.Once);
-            _mockRedisService.Verify(r => r.RemoveDataAsync($"stock_{id}"), Times.Once);
+            _mockRedisService.Verify(r => r.RemoveDataAsync(CacheKeys.StockDetail(id)), Times.Once);
+            _mockRedisService.Verify(r => r.RemoveByPrefixAsync(CacheKeys.StockList), Times.Once);
 
         }
     }

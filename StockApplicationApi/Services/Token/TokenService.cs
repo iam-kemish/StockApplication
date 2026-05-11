@@ -9,26 +9,34 @@ namespace StockApplicationApi.Services.Token
 {
     public class TokenService : ITokenService
     {
-        private readonly IConfiguration _config;
+      
         private readonly UserManager<AppUser> _UserManager;
+        private readonly string _issuer;
+        private readonly string _audience;
+      
+        private readonly SymmetricSecurityKey _key;
 
         public TokenService(IConfiguration configuration, UserManager<AppUser> userManager)
         {
-            _config = configuration;
+          
             _UserManager = userManager;
+             var secretKey = configuration["JWT:SigningKey"] ?? throw new Exception("JWT Secret is missing!");
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            _issuer = configuration["JWT:Issuer"] ?? throw new Exception("JWT Issuer is missing!");
+            _audience = configuration["JWT:Audience"] ?? throw new Exception("JWT Audience is missing!");
         }
         public async Task<string> CreateAccessToken(AppUser user)
         {
             var roles = await _UserManager.GetRolesAsync(user);
-            string secretKey = _config["Jwt:SecretKey"];
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+          
+          
+            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty)
             };  
             foreach (var role in roles)
             {
@@ -38,8 +46,8 @@ namespace StockApplicationApi.Services.Token
             {
                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(60),
-                Issuer = _config["Jwt:Issuer"],
-                Audience = _config["Jwt:Audience"],
+                Issuer = _issuer,
+                Audience = _audience,
                 SigningCredentials = creds
             };
             var tokenHandler = new JwtSecurityTokenHandler();

@@ -53,7 +53,10 @@ builder.Services.AddAuthentication(options => {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
-        )
+        ),
+       
+        ValidateLifetime = true, 
+        ClockSkew = TimeSpan.Zero 
     };
 });
 var redisConnection = builder.Configuration.GetConnectionString("RedisConnection");

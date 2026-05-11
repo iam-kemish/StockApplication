@@ -6,6 +6,7 @@ using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.RedisService;
+using static StockApplicationApi.Helpers.RedisCacheStrings;
 
 namespace StockApplicationApi.Services.StockServices
 {
@@ -16,7 +17,7 @@ namespace StockApplicationApi.Services.StockServices
         private readonly IMapper _IMapper;
         private readonly ILogger<StockClass> _logger;
         private readonly IRedisService _cache;
-        string cacheKey = "stock";
+
         public StockClass(IStock stock, IMapper mapper, ILogger<StockClass> logger, IRedisService redisService)
         {
             _IStock = stock;
@@ -26,11 +27,10 @@ namespace StockApplicationApi.Services.StockServices
         }
         public async Task<StockDTO> AddStock(StockCreateDTO stock)
         {
-           
+
             var existing = await _IStock.GetStock(u =>
                 u.CompanyName.ToLower() == stock.CompanyName.ToLower() ||
-                u.Symbol.ToLower() == stock.Symbol.ToLower() ||
-                u.Industry.ToLower() == stock.Industry.ToLower());
+                u.Symbol.ToLower() == stock.Symbol.ToLower());
 
             if (existing != null)
             {
@@ -49,7 +49,7 @@ namespace StockApplicationApi.Services.StockServices
             }
             var createdStock = _IMapper.Map<Stock>(stock);
             await _IStock.AddStock(createdStock);
-            await _cache.RemoveDataAsync(cacheKey); 
+            await _cache.RemoveByPrefixAsync(CacheKeys.StockList); 
             _logger.LogInformation("Stock created and removed cache successfully: {CompanyName}", stock.CompanyName);
             return _IMapper.Map<StockDTO>(createdStock);
         }
@@ -65,14 +65,14 @@ namespace StockApplicationApi.Services.StockServices
             }
             await _IStock.DeleteStock(stock);
            
-            await _cache.RemoveDataAsync(cacheKey); 
-            await _cache.RemoveDataAsync($"{cacheKey}_{id}");
+            await _cache.RemoveByPrefixAsync(CacheKeys.StockList); 
+            await _cache.RemoveDataAsync(CacheKeys.StockDetail(id));
             _logger.LogInformation("Cache removed successfully after deleting stock with ID: {StockId}", id);
         }
 
         public async Task<IEnumerable<StockDTO>> GetAllStocks(StockQuery stockQuery)
         {
-            string GetCachekey = GenerateCacheKey(stockQuery);
+            string GetCachekey = CacheKeys.GetStockListKey(stockQuery);
             var cachedStocks = await _cache.GetDatasAsync<IEnumerable<StockDTO>>(GetCachekey);
             if (cachedStocks != null)
             {
@@ -86,15 +86,10 @@ namespace StockApplicationApi.Services.StockServices
             return _IMapper.Map<IEnumerable<StockDTO>>(stocks);
         }
 
-        private string GenerateCacheKey(StockQuery query)
-        {
-            return $"stocks_p{query.PageNumber}_s{query.PageSize}_name:{query.CompanyName}_sym:{query.Symbol}_sort:{query.SortBy}";
-        }
-
         public async Task<StockDTO> GetStockById(int id)
         {
           
-            var cachedStock = await _cache.GetDatasAsync<StockDTO>($"{cacheKey}_{id}");
+            var cachedStock = await _cache.GetDatasAsync<StockDTO>(CacheKeys.StockDetail(id));
             if (cachedStock != null)
             {
                 _logger.LogInformation("Stock with ID: {StockId} retrieved from cache", id);
@@ -108,7 +103,7 @@ namespace StockApplicationApi.Services.StockServices
                 _logger.LogWarning("Attempt to retrieve a non-existent stock with ID: {StockId}", id);
                 throw new NotFoundException("Does this Stock exists?");
             }
-            await _cache.SetDataAsync($"{cacheKey}_{id}", _IMapper.Map<StockDTO>(stock), TimeSpan.FromMinutes(5));
+            await _cache.SetDataAsync(CacheKeys.StockDetail(id), _IMapper.Map<StockDTO>(stock), TimeSpan.FromMinutes(5));
             return _IMapper.Map<StockDTO>(stock);
         }
 
@@ -124,8 +119,8 @@ namespace StockApplicationApi.Services.StockServices
             _IMapper.Map(stock, existingStock);
           
             await _IStock.UpdateStock(existingStock);
-            await _cache.RemoveDataAsync($"{cacheKey}_{id}");
-            await _cache.RemoveDataAsync(cacheKey);
+            await _cache.RemoveDataAsync(CacheKeys.StockDetail(id));
+            await _cache.RemoveByPrefixAsync(CacheKeys.StockList); 
             _logger.LogInformation("Stock with ID: {StockId} updated successfully", id);
 
             return _IMapper.Map<StockDTO>(existingStock);

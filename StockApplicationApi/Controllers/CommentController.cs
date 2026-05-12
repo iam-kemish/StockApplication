@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
@@ -24,6 +25,7 @@ namespace StockApplicationApi.Controllers
             _UpdateValidator = UpdateValidator;
         }
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll()
         {
             var comments = await _IComment.GetAllComments();
@@ -36,6 +38,7 @@ namespace StockApplicationApi.Controllers
             });
         }
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateComment dto)
         {
             var validationResult = await _CreateValidator.ValidateAsync(dto);
@@ -73,6 +76,7 @@ namespace StockApplicationApi.Controllers
              );    
         }
         [HttpGet("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
             var comment = await _IComment.GetCommentById(id);
@@ -85,6 +89,7 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] CommentUpdateDTO dto)
         {
 

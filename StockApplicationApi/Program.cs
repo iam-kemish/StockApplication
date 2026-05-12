@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using StockApplicationApi.Database;
 using StockApplicationApi.Mapper;
@@ -59,6 +60,38 @@ builder.Services.AddAuthentication(options => {
         ClockSkew = TimeSpan.Zero 
     };
 });
+
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Stock Application API", Version = "v1" });
+
+    // 1. Define the Security Scheme (How the token looks)
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+
+    // 2. Apply the Security Requirement (Make it global or per-endpoint)
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 var redisConnection = builder.Configuration.GetConnectionString("RedisConnection");
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection!));
 builder.Services.AddAutoMapper(typeof(MapConfig));
@@ -75,12 +108,13 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger();
     app.MapOpenApi(); 
 
     app.UseSwaggerUI(options =>
     {
         // Add the forward slash here!
-        options.SwaggerEndpoint("/openapi/v1.json", "Stock API v1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Stock API v1");
     });
 }
 

@@ -82,8 +82,9 @@ namespace StockApplicationApi.Services.StockServices
 
             var stocks = await _IStock.GetAllStocks(stockQuery);
             _logger.LogInformation("Retrieved all stocks");
-            await _cache.SetDataAsync(GetCachekey, _IMapper.Map<IEnumerable<StockDTO>>(stocks), TimeSpan.FromMinutes(5));
-            return _IMapper.Map<IEnumerable<StockDTO>>(stocks);
+            var resultedStocks = _IMapper.Map<IEnumerable<StockDTO>>(stocks);
+            await _cache.SetDataAsync(GetCachekey, resultedStocks, TimeSpan.FromMinutes(5));
+            return resultedStocks;
         }
 
         public async Task<StockDTO> GetStockById(int id)

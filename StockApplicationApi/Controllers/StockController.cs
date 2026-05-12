@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Helpers;
@@ -28,6 +29,7 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] StockCreateDTO dto)
         {
             var validationResult = await _createValidator.ValidateAsync(dto);
@@ -60,6 +62,7 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
             var stock = await _stockService.GetStockById(id);
@@ -72,6 +75,7 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] StockUpdateDTO dto)
         {
            
@@ -103,6 +107,7 @@ namespace StockApplicationApi.Controllers
       
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] StockQuery stockQuery)
         {
             var stocks = await _stockService.GetAllStocks(stockQuery);
@@ -116,6 +121,7 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             await _stockService.DeleteStock(id);

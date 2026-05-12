@@ -26,17 +26,14 @@ namespace StockApplicationApi.Services.RedisService
         }
         public async Task RemoveByPrefixAsync(string prefix)
         {
-            // This finds every key starting with your prefix (e.g., "stocks_")
+          
             var endpoints = _redis.GetEndPoints();
             var server = _redis.GetServer(endpoints[0]);
 
-            // We use a pattern matching 'stocks_*'
-            var keys = server.Keys(pattern: $"{prefix}*");
+            var keys = server.Keys(pattern: $"{prefix}*").ToArray();
+            if (keys.Any())
+                await _Db.KeyDeleteAsync(keys);
 
-            foreach (var key in keys)
-            {
-                await _Db.KeyDeleteAsync(key);
-            }
         }
 
         public async Task<bool> RemoveDataAsync(string key)

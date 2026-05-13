@@ -25,7 +25,7 @@ namespace StockApplicationApi.Services.StockServices
             _logger = logger;
             _cache = redisService;
         }
-        public async Task<StockDTO> AddStock(StockCreateDTO stock)
+        public async Task<StockDTO> AddStock(StockCreateDTO stock, string userId)
         {
 
             var existing = await _IStock.GetStock(u =>
@@ -42,7 +42,7 @@ namespace StockApplicationApi.Services.StockServices
                 else if (existing.Symbol.Equals(stock.Symbol, StringComparison.OrdinalIgnoreCase))
                     conflictDetail = $"Symbol '{stock.Symbol}'";
                 
-                _logger.LogWarning("Conflict detected: {ConflictDetail}", conflictDetail);
+                _logger.LogWarning("Conflict detected: {ConflictDetail} by User: {UserId}", conflictDetail, userId);
 
              
                 throw new ConflictException($"{conflictDetail} already exists in our records.");
@@ -50,16 +50,16 @@ namespace StockApplicationApi.Services.StockServices
             var createdStock = _IMapper.Map<Stock>(stock);
             await _IStock.AddStock(createdStock);
             await _cache.RemoveByPrefixAsync(CacheKeys.StockList); 
-            _logger.LogInformation("Stock created and removed cache successfully: {CompanyName}", stock.CompanyName);
+            _logger.LogInformation("Stock created and removed cache successfully: {CompanyName} by User: {UserId}", stock.CompanyName, userId   );
             return _IMapper.Map<StockDTO>(createdStock);
         }
 
-        public async Task DeleteStock(int id)
+        public async Task DeleteStock(int id, string userId)
         {
             var stock = await _IStock.GetStock(u => u.Id == id);
             if (stock == null)
             {
-                _logger.LogWarning("Attempt to delete a non-existent stock with ID: {StockId}", id);
+                _logger.LogWarning("Attempt to delete a non-existent stock with ID: {StockId} by User: {UserId}", id, userId);
                 throw new NotFoundException("Does this Stock exists?");
                
             }
@@ -67,7 +67,7 @@ namespace StockApplicationApi.Services.StockServices
            
             await _cache.RemoveByPrefixAsync(CacheKeys.StockList); 
             await _cache.RemoveDataAsync(CacheKeys.StockDetail(id));
-            _logger.LogInformation("Cache removed successfully after deleting stock with ID: {StockId}", id);
+            _logger.LogInformation("Cache removed successfully after deleting stock with ID: {StockId} by User: {UserId}", id, userId);
         }
 
         public async Task<IEnumerable<StockDTO>> GetAllStocks(StockQuery stockQuery)
@@ -87,34 +87,34 @@ namespace StockApplicationApi.Services.StockServices
             return resultedStocks;
         }
 
-        public async Task<StockDTO> GetStockById(int id)
+        public async Task<StockDTO> GetStockById(int id, string userId)
         {
           
             var cachedStock = await _cache.GetDatasAsync<StockDTO>(CacheKeys.StockDetail(id));
             if (cachedStock != null)
             {
-                _logger.LogInformation("Stock with ID: {StockId} retrieved from cache", id);
+                _logger.LogInformation("Stock with ID: {StockId} retrieved from cache by User: {UserId}", id, userId);
                 return cachedStock;
             }
             //If no cache, get from database
-            _logger.LogInformation("Stock with ID: {StockId} not found in cache, retrieving from database", id);
+            _logger.LogInformation("Stock with ID: {StockId} not found in cache, retrieving from database by User: {UserId}", id, userId);
             var stock = await _IStock.GetStock(u => u.Id == id);
             if (stock == null)
             {
-                _logger.LogWarning("Attempt to retrieve a non-existent stock with ID: {StockId}", id);
+                _logger.LogWarning("Attempt to retrieve a non-existent stock with ID: {StockId} by User: {UserId}", id, userId);
                 throw new NotFoundException("Does this Stock exists?");
             }
             await _cache.SetDataAsync(CacheKeys.StockDetail(id), _IMapper.Map<StockDTO>(stock), TimeSpan.FromMinutes(5));
             return _IMapper.Map<StockDTO>(stock);
         }
 
-        public async Task<StockDTO> UpdateStock(int id, StockUpdateDTO stock)
+        public async Task<StockDTO> UpdateStock(int id, StockUpdateDTO stock, string userId)
         {           
         
             var existingStock = await _IStock.GetStock(u => u.Id == id, tracking: true);
             if (existingStock == null)
             {
-                _logger.LogWarning("Attempt to update a non-existent stock with ID: {StockId}", id);
+                _logger.LogWarning("Attempt to update a non-existent stock with ID: {StockId} by User: {UserId}", id, userId);
                 throw new NotFoundException("Does this Stock exists?");
             }
             _IMapper.Map(stock, existingStock);
@@ -122,7 +122,7 @@ namespace StockApplicationApi.Services.StockServices
             await _IStock.UpdateStock(existingStock);
             await _cache.RemoveDataAsync(CacheKeys.StockDetail(id));
             await _cache.RemoveByPrefixAsync(CacheKeys.StockList); 
-            _logger.LogInformation("Stock with ID: {StockId} updated successfully", id);
+            _logger.LogInformation("Stock with ID: {StockId} updated successfully by User: {UserId}", id, userId);
 
             return _IMapper.Map<StockDTO>(existingStock);
         }

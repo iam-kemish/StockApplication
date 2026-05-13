@@ -28,18 +28,18 @@ namespace StockApplicationApi.Services.CommentServices
             _IRedis = redisService;
         
         }
-        public async Task<CommentDto> AddComment(CreateComment comment, int stockId)
+        public async Task<CommentDto> AddComment(CreateComment comment, int stockId, string userId)
         {
          if ( !await _IStock.StockExists(stockId))
             {
-                _logger.LogWarning("Attempt to add comment for non-existing stockId: {StockId}", stockId);
+                _logger.LogWarning("Attempt to add comment for non-existing stockId: {StockId} by User: {UserId}", stockId, userId);
                 throw new ConflictException("This stock doesnt exist in stock database");
             }
             var createdComment = _IMapper.Map<Comment>(comment);
             createdComment.StockId = stockId;
             await _IComment.AddComment(createdComment);
             await _IRedis.RemoveByPrefixAsync(CacheKeys.CommentList); 
-            _logger.LogInformation("Comment added for stockId: {StockId}", stockId);
+            _logger.LogInformation("Comment added for stockId: {StockId} by User: {UserId}", stockId, userId);
             return _IMapper.Map<CommentDto>(createdComment);
         }
 
@@ -53,26 +53,26 @@ namespace StockApplicationApi.Services.CommentServices
             return  _IMapper.Map<IEnumerable<CommentDto>>(comments);
         }
 
-        public async Task<CommentDto> GetCommentById(int id)
+        public async Task<CommentDto> GetCommentById(int id, string userId)
         {
-            _logger.LogInformation("Retrieving comment with id: {CommentId}", id);
+            _logger.LogInformation("Retrieving comment with id: {CommentId} by User: {UserId}", id, userId);
             var comment = await _IComment.GetComment(u => u.Id == id);
             if (comment == null)
             {
-                _logger.LogWarning("Comment with id: {CommentId} not found", id);
+                _logger.LogWarning("Comment with id: {CommentId} not found by User: {UserId}", id, userId);
                 throw new NotFoundException("does this stock exists?");
             }
             await _IRedis.SetDataAsync(CacheKeys.CommentDetail(id), comment, TimeSpan.FromMinutes(10));
             return _IMapper.Map<CommentDto>(comment);
         }
 
-        public async Task<CommentDto> UpdateComment(int id, CommentUpdateDTO comment)
+        public async Task<CommentDto> UpdateComment(int id, CommentUpdateDTO comment, string userId)
         {
             var existingComment = await _IComment.GetComment(u=>u.Id == id, tracking: true);
             if (existingComment == null)
             {
 
-                _logger.LogWarning("Attempt to update non-existing comment with id: {CommentId}", id);
+                _logger.LogWarning("Attempt to update non-existing comment with id: {CommentId} by User: {UserId}", id, userId);
              
                 throw new NotFoundException("Does this Comment exists?");
             }
@@ -85,7 +85,7 @@ namespace StockApplicationApi.Services.CommentServices
             await _IComment.UpdateComment(existingComment);
             await _IRedis.RemoveByPrefixAsync(CacheKeys.CommentList);
             await _IRedis.RemoveDataAsync(CacheKeys.CommentDetail(id));
-            _logger.LogInformation("Comment with id: {CommentId} updated successfully", id);
+            _logger.LogInformation("Comment with id: {CommentId} updated successfully by User: {UserId}", id, userId);
 
             return _IMapper.Map<CommentDto>(existingComment);
         }

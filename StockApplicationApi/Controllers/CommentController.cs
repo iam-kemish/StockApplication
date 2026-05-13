@@ -8,6 +8,7 @@ using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Services.StockServices;
 using System.Net;
+using System.Security.Claims;
 
 namespace StockApplicationApi.Controllers
 {
@@ -25,7 +26,7 @@ namespace StockApplicationApi.Controllers
             _UpdateValidator = UpdateValidator;
         }
         [HttpGet]
-        [Authorize]
+       
         public async Task<IActionResult> GetAll()
         {
             var comments = await _IComment.GetAllComments();
@@ -41,6 +42,7 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateComment dto)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var validationResult = await _CreateValidator.ValidateAsync(dto);
 
             if (!validationResult.IsValid)
@@ -64,7 +66,7 @@ namespace StockApplicationApi.Controllers
 
                     );
             }
-            var createdComment =await _IComment.AddComment(dto, dto.StockId);
+            var createdComment =await _IComment.AddComment(dto, dto.StockId, userId!);
 
             return Ok(new APIResponse
             {
@@ -79,7 +81,8 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
-            var comment = await _IComment.GetCommentById(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var comment = await _IComment.GetCommentById(id, userId!);
             return Ok(new APIResponse
             {
                 IsSuccess = true,
@@ -92,7 +95,7 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] CommentUpdateDTO dto)
         {
-
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var validationResult = await _UpdateValidator.ValidateAsync(dto);
 
             if (!validationResult.IsValid)
@@ -107,7 +110,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var updatedStock = await _IComment.UpdateComment(id, dto);
+            var updatedStock = await _IComment.UpdateComment(id, dto, userId!);
 
             return Ok(new APIResponse
             {

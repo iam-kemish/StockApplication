@@ -10,6 +10,7 @@ using StockApplicationApi.Mapper;
 using StockApplicationApi.Models;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
+using StockApplicationApi.Seeders;
 using StockApplicationApi.Services.AuthService;
 using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Services.RedisService;
@@ -102,6 +103,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRedisService, RedisClass>();
+builder.Services.AddScoped<IdentitySeeder>();
 
 var app = builder.Build();
 
@@ -117,7 +119,12 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Stock API v1");
     });
 }
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<IdentitySeeder>();
+    await seeder.SeedAdminAsync();
 
+}
 app.UseMiddleware<GlobalException>();
 
 app.UseHttpsRedirection();

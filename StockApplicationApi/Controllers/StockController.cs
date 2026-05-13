@@ -7,6 +7,7 @@ using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Services.StockServices;
 using System.Net;
+using System.Security.Claims;
 
 namespace StockApplicationApi.Controllers
 {
@@ -29,9 +30,10 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] StockCreateDTO dto)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var validationResult = await _createValidator.ValidateAsync(dto);
 
             if (!validationResult.IsValid)
@@ -46,7 +48,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var createdStock = await _stockService.AddStock(dto);
+            var createdStock = await _stockService.AddStock(dto, userId!);
 
             return CreatedAtAction(
                 nameof(GetById),
@@ -65,7 +67,8 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
-            var stock = await _stockService.GetStockById(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var stock = await _stockService.GetStockById(id, userId!);
             return Ok(new APIResponse
             {
                 IsSuccess = true,
@@ -75,10 +78,10 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] StockUpdateDTO dto)
         {
-           
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var validationResult = await _updateValidator.ValidateAsync(dto);
 
             if (!validationResult.IsValid)
@@ -93,7 +96,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var updatedStock = await _stockService.UpdateStock(id, dto);
+            var updatedStock = await _stockService.UpdateStock(id, dto, userId!);
 
             return Ok(new APIResponse
             {
@@ -107,7 +110,7 @@ namespace StockApplicationApi.Controllers
       
 
         [HttpGet]
-        [Authorize]
+    
         public async Task<IActionResult> GetAll([FromQuery] StockQuery stockQuery)
         {
             var stocks = await _stockService.GetAllStocks(stockQuery);
@@ -121,10 +124,11 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _stockService.DeleteStock(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            await _stockService.DeleteStock(id, userId!);
 
             return NoContent(); 
         }

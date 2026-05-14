@@ -25,9 +25,13 @@ namespace StockApplicationApi.Services.StockServices
             _logger = logger;
             _cache = redisService;
         }
-        public async Task<StockDTO> AddStock(StockCreateDTO stock, string userId)
+        public async Task<StockDTO> AddStock(StockCreateDTO stock, string userId, bool isAdmin = true)
         {
-
+           if(!isAdmin)
+            {
+                _logger.LogWarning("Unauthorized attempt to add stock by User: {UserId}", userId);
+                throw new UnAuthorizedException("Access Denied: You do not have the Admin role required for this action.");
+            }
             var existing = await _IStock.GetStock(u =>
                 u.CompanyName.ToLower() == stock.CompanyName.ToLower() ||
                 u.Symbol.ToLower() == stock.Symbol.ToLower());
@@ -54,8 +58,13 @@ namespace StockApplicationApi.Services.StockServices
             return _IMapper.Map<StockDTO>(createdStock);
         }
 
-        public async Task DeleteStock(int id, string userId)
+        public async Task DeleteStock(int id, string userId, bool isAdmin = true)
         {
+            if (!isAdmin)
+            {
+                _logger.LogWarning("Unauthorized attempt to delete stock with ID: {StockId} by User: {UserId}", id, userId);
+                throw new UnAuthorizedException("Access Denied: You do not have the Admin role required for this action.");
+            }
             var stock = await _IStock.GetStock(u => u.Id == id);
             if (stock == null)
             {
@@ -108,9 +117,14 @@ namespace StockApplicationApi.Services.StockServices
             return _IMapper.Map<StockDTO>(stock);
         }
 
-        public async Task<StockDTO> UpdateStock(int id, StockUpdateDTO stock, string userId)
+        public async Task<StockDTO> UpdateStock(int id, StockUpdateDTO stock, string userId, bool isAdmin = true)
         {           
-        
+            if (!isAdmin)
+            {
+                _logger.LogWarning("Unauthorized attempt to update stock with ID: {StockId} by User: {UserId}", id, userId);
+                throw new UnAuthorizedException("Access Denied: You do not have the Admin role required for this action.");
+            }
+
             var existingStock = await _IStock.GetStock(u => u.Id == id, tracking: true);
             if (existingStock == null)
             {
@@ -128,4 +142,4 @@ namespace StockApplicationApi.Services.StockServices
         }
 
     }
-    }
+}

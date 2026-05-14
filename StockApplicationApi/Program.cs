@@ -60,6 +60,7 @@ builder.Services.AddAuthentication(options => {
         ValidateLifetime = true, 
         ClockSkew = TimeSpan.Zero 
     };
+   
 });
 
 builder.Services.AddSwaggerGen(option =>

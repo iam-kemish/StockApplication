@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Helpers;
@@ -30,10 +31,11 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] StockCreateDTO dto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            bool isAdmin = User.IsInRole("Admin");
             var validationResult = await _createValidator.ValidateAsync(dto);
 
             if (!validationResult.IsValid)
@@ -48,7 +50,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var createdStock = await _stockService.AddStock(dto, userId!);
+            var createdStock = await _stockService.AddStock(dto, userId!, isAdmin);
 
             return CreatedAtAction(
                 nameof(GetById),
@@ -78,7 +80,7 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] StockUpdateDTO dto)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -96,7 +98,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var updatedStock = await _stockService.UpdateStock(id, dto, userId!);
+            var updatedStock = await _stockService.UpdateStock(id, dto, userId!, isAdmin: User.IsInRole("Admin"));
 
             return Ok(new APIResponse
             {
@@ -124,13 +126,21 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            await _stockService.DeleteStock(id, userId!);
+            bool isAdmin = User.IsInRole("Admin");
+            await _stockService.DeleteStock(id, userId!, isAdmin);
 
-            return NoContent(); 
+         return Ok(new APIResponse
+         {
+              IsSuccess = true,
+              statusCode = HttpStatusCode.NoContent,
+               Message = "Stock deleted successfully"
+         }
+               
+            );
         }
     }
 }

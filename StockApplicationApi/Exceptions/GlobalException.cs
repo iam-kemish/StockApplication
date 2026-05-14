@@ -61,6 +61,11 @@ public class GlobalException
                 response.Message = "Conflict occurred.";
                 response.Errors = new { detail = ex.Message };
                 break;
+            case UnAuthorizedException ex:
+                response.statusCode = HttpStatusCode.Unauthorized;
+                response.Message = "Unauthorized access.";
+                response.Errors = new { detail = ex.Message };
+                break;
 
             case AppException ex:
                 response.statusCode = ex.StatusCode;

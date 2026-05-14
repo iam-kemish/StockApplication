@@ -40,15 +40,17 @@ namespace StockApplication.UnitTests.Services
         [Fact]
         public async Task AddComment_StockNotFound_ThrowsConflictException()
         {
+
             var createCommentDto = new CreateComment
             {
                 Title = "Test Comment",
                 Content = "This is a test comment",
                 StockId = 1
             };
+           var userId = "123";
             _IStock.Setup(r => r.StockExists(createCommentDto.StockId)).ReturnsAsync(false);
             var ex = await Assert.ThrowsAsync<ConflictException>(
-             () => _service.AddComment(createCommentDto,createCommentDto.StockId)        
+             () => _service.AddComment(createCommentDto,createCommentDto.StockId, userId)        
          );
 
             Assert.Contains("This stock doesnt exist in stock database", ex.Message );
@@ -57,6 +59,7 @@ namespace StockApplication.UnitTests.Services
             [Fact]
         public async Task AddComment_ValidComment_ReturnsCommentDTO()
         {
+            var userID = "123";
             var CommentEntity = new Comment
             {
                 Id = 1,
@@ -89,7 +92,7 @@ namespace StockApplication.UnitTests.Services
                      .Returns(Task.CompletedTask);
 
             // ACT
-            var result = await _service.AddComment(createCommentDto,createCommentDto.StockId);
+            var result = await _service.AddComment(createCommentDto,createCommentDto.StockId, userID);
 
             Assert.NotNull(result);
             Assert.Contains("This is a new comment", result.Content);
@@ -104,6 +107,7 @@ namespace StockApplication.UnitTests.Services
         [Fact]
         public async Task UpdateComment_CommentNotFound_ThrowsNotFoundException()
         {
+            var userID = "123";
             CommentUpdateDTO commentUpdateDTO = new();
             int id = 1;
 
@@ -114,7 +118,7 @@ namespace StockApplication.UnitTests.Services
 
             // ACT
             var ex = await Assert.ThrowsAsync<NotFoundException>(
-                () => _service.UpdateComment(id, commentUpdateDTO)
+                () => _service.UpdateComment(id, commentUpdateDTO, userID)
             );
 
             // ASSERT
@@ -124,6 +128,7 @@ namespace StockApplication.UnitTests.Services
         [Fact]
         public async Task UpdateComment_ValidComment_FieldsAreCorrectlyMapped()
         {
+            var userID = "123";
             CommentUpdateDTO commentUpdateDTO = new()
             {
               Title = "TITLEUPDATED",
@@ -140,7 +145,7 @@ namespace StockApplication.UnitTests.Services
             _mockRepo.Setup(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>(), true))
              .ReturnsAsync(existingComment);
 
-            await _service.UpdateComment(id, commentUpdateDTO);
+            await _service.UpdateComment(id, commentUpdateDTO, userID);
 
             Assert.NotNull(existingComment);
             Assert.Contains("TITLEUPDATED", existingComment.Title);

@@ -37,6 +37,7 @@ namespace StockApplicationApi.Services.CommentServices
             }
             var createdComment = _IMapper.Map<Comment>(comment);
             createdComment.StockId = stockId;
+            createdComment.AppUserId = userId;
             await _IComment.AddComment(createdComment);
             await _IRedis.RemoveByPrefixAsync(CacheKeys.CommentList); 
             _logger.LogInformation("Comment added for stockId: {StockId} by User: {UserId}", stockId, userId);

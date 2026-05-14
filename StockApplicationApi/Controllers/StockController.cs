@@ -34,7 +34,7 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> Create([FromBody] StockCreateDTO dto)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
             bool isAdmin = User.IsInRole("Admin");
             var validationResult = await _createValidator.ValidateAsync(dto);
 
@@ -50,7 +50,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var createdStock = await _stockService.AddStock(dto, userId!, isAdmin);
+            var createdStock = await _stockService.AddStock(dto, isAdmin);
 
             return CreatedAtAction(
                 nameof(GetById),
@@ -69,8 +69,8 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var stock = await _stockService.GetStockById(id, userId!);
+            
+            var stock = await _stockService.GetStockById(id);
             return Ok(new APIResponse
             {
                 IsSuccess = true,
@@ -83,7 +83,7 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] StockUpdateDTO dto)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
             var validationResult = await _updateValidator.ValidateAsync(dto);
 
             if (!validationResult.IsValid)
@@ -98,7 +98,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var updatedStock = await _stockService.UpdateStock(id, dto, userId!, isAdmin: User.IsInRole("Admin"));
+            var updatedStock = await _stockService.UpdateStock(id, dto, isAdmin: User.IsInRole("Admin"));
 
             return Ok(new APIResponse
             {
@@ -129,9 +129,9 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
             bool isAdmin = User.IsInRole("Admin");
-            await _stockService.DeleteStock(id, userId!, isAdmin);
+            await _stockService.DeleteStock(id, isAdmin);
 
          return Ok(new APIResponse
          {

@@ -81,8 +81,8 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var comment = await _IComment.GetCommentById(id, userId!);
+           
+            var comment = await _IComment.GetCommentById(id);
             return Ok(new APIResponse
             {
                 IsSuccess = true,

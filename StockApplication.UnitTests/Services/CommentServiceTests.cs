@@ -126,6 +126,28 @@ namespace StockApplication.UnitTests.Services
           _mockRepo.Verify(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>(), true), Times.Once);
         }
         [Fact]
+        public async Task UpdateComment_UnauthorizedUser_ThrowsNotFoundException()
+        {
+            int id = 1;
+            CommentUpdateDTO commentUpdateDTO = new();
+            string userId = "123";
+
+            var existingComment = new Comment
+            {
+                Id = 1,
+                Title = "TITLE",
+                Content = "THIS IS CONTENT",
+                AppUserId = "456"
+            };      
+            _mockRepo.Setup(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>(), true))
+             .ReturnsAsync(existingComment);
+            var ex = await Assert.ThrowsAsync<UnAuthorizedException>(
+                () => _service.UpdateComment(existingComment.Id, commentUpdateDTO, userId)
+            );
+            Assert.Contains("You are unauthorised.", ex.Message);
+            _mockRepo.Verify(r => r.GetComment(It.IsAny<Expression<Func<Comment, bool>>>(), true), Times.Once);
+        }
+        [Fact]
         public async Task UpdateComment_ValidComment_FieldsAreCorrectlyMapped()
         {
             var userID = "123";
@@ -138,7 +160,8 @@ namespace StockApplication.UnitTests.Services
             {
                 Id = 1,
               Title = "TITLE",
-              Content="THIS IS CONTENT"
+              Content="THIS IS CONTENT",
+              AppUserId = "123"
             };
             int id = 1;
          
@@ -150,7 +173,7 @@ namespace StockApplication.UnitTests.Services
             Assert.NotNull(existingComment);
             Assert.Contains("TITLEUPDATED", existingComment.Title);
             Assert.Contains("THIS IS CONTENT", existingComment.Content);
-           
+         
 
             _mockRepo.Verify(r => r.UpdateComment(existingComment), Times.Once);
 

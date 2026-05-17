@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using StockApplicationApi.Database;
 using StockApplicationApi.Models;
+using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Models.RefreshTokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace StockApplicationApi.Services.Token
@@ -15,11 +19,13 @@ namespace StockApplicationApi.Services.Token
         private readonly string _audience;
       
         private readonly SymmetricSecurityKey _key;
+        private readonly AppDbContext _dbContext;
 
-        public TokenService(IConfiguration configuration, UserManager<AppUser> userManager)
+        public TokenService(IConfiguration configuration, UserManager<AppUser> userManager, AppDbContext dbContext)
         {
           
             _UserManager = userManager;
+            _dbContext = dbContext;
              var secretKey = configuration["JWT:SigningKey"] ?? throw new Exception("JWT Secret is missing!");
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             _issuer = configuration["JWT:Issuer"] ?? throw new Exception("JWT Issuer is missing!");
@@ -54,5 +60,21 @@ namespace StockApplicationApi.Services.Token
             var token = tokenHandler.CreateToken(TokenDesc);
             return tokenHandler.WriteToken(token);
         }   
+        public string GenerateRefreshToken()
+        {
+          return  Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
+        }
+
+        public Task<AuthResponseDTO> RefreshToken(string token, string refreshToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task SaveRefreshTokens(RefreshToken refreshToken)
+        {
+           await _dbContext.RefreshTokens.AddAsync(refreshToken);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

@@ -2,6 +2,7 @@
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Models.RefreshTokens;
 using StockApplicationApi.Services.Token;
 
 namespace StockApplicationApi.Services.AuthService
@@ -86,12 +87,21 @@ namespace StockApplicationApi.Services.AuthService
                 throw new UnAuthorizedException("Invalid credentials check if Password is wrong or empty.");
             }
             var token = await _tokenService.CreateAccessToken(user);
-          
+            var refreshToken = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                Token = _tokenService.GenerateRefreshToken(),
+                Expires = DateTime.UtcNow.AddDays(7), 
+                Created = DateTime.UtcNow,
+                AppUserId = user.Id
+            };
+            await _tokenService.SaveRefreshTokens(refreshToken);
             return new AuthResponseDTO
             {
                 UserName = user.UserName,
                 Email = user.Email,
-                Token =  token
+                Token =  token,
+                RefreshToken = refreshToken.Token
             };
         }
         

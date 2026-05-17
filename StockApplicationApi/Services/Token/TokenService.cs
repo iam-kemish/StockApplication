@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using StockApplicationApi.Database;
+using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
 using StockApplicationApi.Models.RefreshTokens;
+using StockApplicationApi.Repositary.RefreshTokenRepositary;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -15,18 +17,19 @@ namespace StockApplicationApi.Services.Token
     {
       
         private readonly UserManager<AppUser> _UserManager;
+        private readonly IRefreshToken _IRefresh;
         private readonly string _issuer;
         private readonly string _audience;
       
         private readonly SymmetricSecurityKey _key;
-        private readonly AppDbContext _dbContext;
+      
 
-        public TokenService(IConfiguration configuration, UserManager<AppUser> userManager, AppDbContext dbContext)
+        public TokenService(IConfiguration configuration, UserManager<AppUser> userManager, IRefreshToken refreshToken)
         {
           
             _UserManager = userManager;
-            _dbContext = dbContext;
-             var secretKey = configuration["JWT:SigningKey"] ?? throw new Exception("JWT Secret is missing!");
+             _IRefresh = refreshToken;
+            var secretKey = configuration["JWT:SigningKey"] ?? throw new Exception("JWT Secret is missing!");
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             _issuer = configuration["JWT:Issuer"] ?? throw new Exception("JWT Issuer is missing!");
             _audience = configuration["JWT:Audience"] ?? throw new Exception("JWT Audience is missing!");
@@ -66,15 +69,5 @@ namespace StockApplicationApi.Services.Token
 
         }
 
-        public Task<AuthResponseDTO> RefreshToken(string token, string refreshToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SaveRefreshTokens(RefreshToken refreshToken)
-        {
-           await _dbContext.RefreshTokens.AddAsync(refreshToken);
-            await _dbContext.SaveChangesAsync();
-        }
     }
 }

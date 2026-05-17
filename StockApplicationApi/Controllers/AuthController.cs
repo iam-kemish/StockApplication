@@ -76,5 +76,18 @@ namespace StockApplicationApi.Controllers
                     }
                 );
         }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDTO dto)
+        {
+            var result = await _authService.RefreshToken(dto.token, dto.RefreshToken);
+
+            return Ok(new APIResponse
+            {
+                IsSuccess = true,
+                statusCode = HttpStatusCode.OK,
+                Message = "Token refreshed successfully",
+                Result = result
+            });
+        }
     }
 }

@@ -5,6 +5,7 @@ using Moq;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Repositary.RefreshTokenRepositary;
 using StockApplicationApi.Services.AuthService;
 using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Services.Token;
@@ -16,6 +17,7 @@ namespace StockApplication.UnitTests.Services
         private readonly Mock<UserManager<AppUser>> _userManagerMock;
         private readonly Mock<RoleManager<IdentityRole>> _roleManagerMock;
         private readonly Mock<ITokenService> _tokenServiceMock;
+        private readonly Mock<IRefreshToken> _refreshTokenMock;
         private readonly AuthService _sut;
         private readonly Mock<ILogger<AuthService>> _mockLogger;
         public AuthServiceTests()
@@ -25,8 +27,9 @@ namespace StockApplication.UnitTests.Services
             _roleManagerMock = new Mock<RoleManager<IdentityRole>>(
                 Mock.Of<IRoleStore<IdentityRole>>(), null, null, null, null);
             _tokenServiceMock = new Mock<ITokenService>();
+            _refreshTokenMock = new Mock<IRefreshToken>();
             _mockLogger = new Mock<ILogger<AuthService>>();
-            _sut = new AuthService(_userManagerMock.Object, _roleManagerMock.Object, _tokenServiceMock.Object, _mockLogger.Object);
+            _sut = new AuthService(_userManagerMock.Object, _roleManagerMock.Object, _tokenServiceMock.Object, _mockLogger.Object, _refreshTokenMock.Object);
         }
         [Fact]
         public async Task Register_ShouldThrowConflictException_WhenEmailAlreadyExists()

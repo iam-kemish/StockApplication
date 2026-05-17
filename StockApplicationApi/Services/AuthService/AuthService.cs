@@ -3,6 +3,7 @@ using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
 using StockApplicationApi.Models.RefreshTokens;
+using StockApplicationApi.Repositary.RefreshTokenRepositary;
 using StockApplicationApi.Services.Token;
 
 namespace StockApplicationApi.Services.AuthService
@@ -13,17 +14,21 @@ namespace StockApplicationApi.Services.AuthService
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ITokenService _tokenService;
         private readonly ILogger<AuthService> _logger;
+        private readonly IRefreshToken _IRefresh;
 
         public AuthService(
             UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager,
             ITokenService tokenService,
-            ILogger<AuthService> logger)
+            ILogger<AuthService> logger,
+            IRefreshToken refreshToken
+            )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
             _logger = logger;
+            _IRefresh = refreshToken;
         }
 
         public async Task<AuthResponseDTO> Register(RegisterDTO dto)
@@ -95,7 +100,7 @@ namespace StockApplicationApi.Services.AuthService
                 Created = DateTime.UtcNow,
                 AppUserId = user.Id
             };
-            await _tokenService.SaveRefreshTokens(refreshToken);
+            await _IRefresh.SaveRefreshTokens(refreshToken);
             return new AuthResponseDTO
             {
                 UserName = user.UserName,
@@ -104,6 +109,45 @@ namespace StockApplicationApi.Services.AuthService
                 RefreshToken = refreshToken.Token
             };
         }
-        
+        public async Task<AuthResponseDTO> RefreshToken(string token, string refreshToken)
+        {
+            var storedToken = await _IRefresh.GetRefreshToken(refreshToken);
+            if (storedToken == null)
+            {
+                throw new NotFoundException("Refresh Token not found.");
+            }
+            if (storedToken.IsUsed)
+                throw new UnAuthorizedException("Refresh token has already been used.");
+
+            if (storedToken.IsRevoked)
+                throw new UnAuthorizedException("Refresh token has been revoked.");
+
+            if (storedToken.Expires < DateTime.UtcNow)
+                throw new UnAuthorizedException("Refresh token has expired. Please login again.");
+            storedToken.IsUsed = true;
+            await _IRefresh.UpdateRefreshToken(storedToken);
+
+            var user = storedToken.AppUser;
+            var newAccessToken = await _tokenService.CreateAccessToken(user);
+            var newRefreshToken = new RefreshToken
+            {
+                Token = _tokenService.GenerateRefreshToken(),
+                Expires = DateTime.UtcNow.AddDays(7),
+                AppUserId = user.Id,
+                IsRevoked = false,
+                IsUsed = false,
+            };
+            await _IRefresh.SaveRefreshTokens(newRefreshToken);
+
+            return new AuthResponseDTO
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                Token = newAccessToken,
+                RefreshToken = newRefreshToken.Token,
+                
+            };
+        }
+
     }
 }

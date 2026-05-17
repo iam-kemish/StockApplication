@@ -6,5 +6,7 @@ namespace StockApplicationApi.Services.AuthService
     {
         Task<AuthResponseDTO> Register(RegisterDTO dto);
         Task<AuthResponseDTO> Login(LoginDTO dto);
+
+        Task<AuthResponseDTO> RefreshToken(string token, string refreshToken);
     }
 }

@@ -50,7 +50,7 @@ namespace StockApplicationApi.Services.Token
             var TokenDesc = new SecurityTokenDescriptor
             {
                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(1),
+                Expires = DateTime.UtcNow.AddMinutes(10),
                 Issuer = _issuer,
                 Audience = _audience,
                 SigningCredentials = creds

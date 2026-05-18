@@ -19,6 +19,7 @@ using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Services.Token;
 using StockApplicationApi.Validators.Auth;
 using StockApplicationApi.Validators.Stocks;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +44,9 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options => {
 }).AddEntityFrameworkStores<AppDbContext>();
 
 // Authentication
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme =
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;

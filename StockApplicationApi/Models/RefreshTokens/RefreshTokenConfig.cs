@@ -22,6 +22,8 @@ namespace StockApplicationApi.Models.RefreshTokens
                    .WithMany()
                    .HasForeignKey(x => x.AppUserId)
                    .OnDelete(DeleteBehavior.Cascade);
+            builder.HasIndex(x=>x.Expires);
+            builder.HasIndex(x=>x.AppUserId);
         } 
         
 

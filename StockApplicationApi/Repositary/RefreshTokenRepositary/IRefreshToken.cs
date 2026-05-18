@@ -8,6 +8,8 @@ namespace StockApplicationApi.Repositary.RefreshTokenRepositary
         Task SaveRefreshTokens(RefreshToken refreshToken);
         Task<RefreshToken?> GetRefreshToken(string token);
         Task  UpdateRefreshToken(RefreshToken refreshToken);
-        
+
+        Task RevokeAllTokens(string userId);
+
     }
 }

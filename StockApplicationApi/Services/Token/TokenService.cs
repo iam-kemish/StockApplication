@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using StockApplicationApi.Database;
-using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
-using StockApplicationApi.Models.DTOs;
-using StockApplicationApi.Models.RefreshTokens;
 using StockApplicationApi.Repositary.RefreshTokenRepositary;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -54,7 +50,7 @@ namespace StockApplicationApi.Services.Token
             var TokenDesc = new SecurityTokenDescriptor
             {
                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(60),
+                Expires = DateTime.UtcNow.AddMinutes(1),
                 Issuer = _issuer,
                 Audience = _audience,
                 SigningCredentials = creds

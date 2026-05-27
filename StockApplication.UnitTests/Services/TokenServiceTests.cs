@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Moq;
 using StockApplicationApi.Models;
+using StockApplicationApi.Repositary.RefreshTokenRepositary;
 using StockApplicationApi.Services.Token;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -13,6 +14,7 @@ namespace StockApplication.UnitTests.Services
         private readonly Mock<UserManager<AppUser>> _userManagerMock;
         private readonly IConfiguration _config;
         private readonly TokenService _sut;
+        private readonly Mock<IRefreshToken> _refreshTokenMock;
         public TokenServiceTests()
         {
             _userManagerMock = new Mock<UserManager<AppUser>>(
@@ -27,7 +29,8 @@ namespace StockApplication.UnitTests.Services
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            _sut = new TokenService(_config, _userManagerMock.Object);
+            _refreshTokenMock = new Mock<IRefreshToken>();
+            _sut = new TokenService(_config, _userManagerMock.Object, _refreshTokenMock.Object);
         }
         [Fact]
         public async Task CreateAccessToken_ShouldIncludeRoles()

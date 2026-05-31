@@ -12,8 +12,8 @@ using StockApplicationApi.Database;
 namespace StockApplicationApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260527084104_InitialPostgreSQLTimeStampChanges")]
-    partial class InitialPostgreSQLTimeStampChanges
+    [Migration("20260531101323_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

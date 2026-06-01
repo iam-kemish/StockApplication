@@ -42,6 +42,7 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateComment dto)
         {
+            bool isCustomer  = User.IsInRole("Customer");
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var validationResult = await _CreateValidator.ValidateAsync(dto);
 
@@ -66,7 +67,7 @@ namespace StockApplicationApi.Controllers
 
                     );
             }
-            var createdComment =await _IComment.AddComment(dto, dto.StockId, userId!);
+            var createdComment =await _IComment.AddComment(dto, dto.StockId, userId!,isCustomer);
 
             return Ok(new APIResponse
             {
@@ -95,6 +96,7 @@ namespace StockApplicationApi.Controllers
         [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] CommentUpdateDTO dto)
         {
+            bool isCustomer  = User.IsInRole("Customer");
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var validationResult = await _UpdateValidator.ValidateAsync(dto);
 
@@ -110,7 +112,7 @@ namespace StockApplicationApi.Controllers
                 throw new AppValidationException(errors);
             }
 
-            var updatedStock = await _IComment.UpdateComment(id, dto, userId!);
+            var updatedStock = await _IComment.UpdateComment(id, dto, userId!, isCustomer);
 
             return Ok(new APIResponse
             {

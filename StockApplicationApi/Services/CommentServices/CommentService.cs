@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
-using FluentValidation;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.CommentDTOs;
-using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.CommentRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.RedisService;
@@ -28,9 +26,14 @@ namespace StockApplicationApi.Services.CommentServices
             _IRedis = redisService;
         
         }
-        public async Task<CommentDto> AddComment(CreateComment comment, int stockId, string userId)
+        public async Task<CommentDto> AddComment(CreateComment comment, int stockId, string userId, bool isCustomer = true)
         {
-         if ( !await _IStock.StockExists(stockId))
+            if (!isCustomer)
+            {
+                _logger.LogWarning("Unauthorized attempt to add stock");
+                throw new UnAuthorizedException("Access Denied: You do not have the Customer  role required for this action.");
+            }
+            if ( !await _IStock.StockExists(stockId))
             {
                 _logger.LogWarning("Attempt to add comment for non-existing stockId: {StockId} by User: {UserId}", stockId, userId);
                 throw new ConflictException("This stock doesnt exist in stock database");
@@ -67,7 +70,7 @@ namespace StockApplicationApi.Services.CommentServices
             return _IMapper.Map<CommentDto>(comment);
         }
 
-        public async Task<CommentDto> UpdateComment(int id, CommentUpdateDTO comment, string userId)
+        public async Task<CommentDto> UpdateComment(int id, CommentUpdateDTO comment, string userId, bool isCustomer = true)
         {
             var existingComment = await _IComment.GetComment(u=>u.Id == id, tracking:true);
 
@@ -82,6 +85,11 @@ namespace StockApplicationApi.Services.CommentServices
             {
                 _logger.LogWarning("User: {UserId} attempted to update comment with id: {CommentId} without permission", userId, id);
                 throw new UnAuthorizedException("You are unauthorised.");
+            }
+            if (!isCustomer)
+            {
+                _logger.LogWarning("Unauthorized attempt to update comment with id: {CommentId} by User: {UserId}", id, userId);
+                throw new UnAuthorizedException("Access Denied: You do not have the Customer role required for this action.");
             }
 
             existingComment.Title = comment.Title;

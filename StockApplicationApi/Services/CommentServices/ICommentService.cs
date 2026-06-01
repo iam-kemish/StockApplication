@@ -6,7 +6,7 @@ namespace StockApplicationApi.Services.CommentServices
     {
         Task<IEnumerable<CommentDto>> GetAllComments();
         Task<CommentDto> GetCommentById(int id);
-        Task<CommentDto> AddComment(CreateComment comment, int stockId, string userId);
-        Task<CommentDto> UpdateComment(int id, CommentUpdateDTO comment,string userId);
+        Task<CommentDto> AddComment(CreateComment comment, int stockId, string userId, bool isCustomer = true);
+        Task<CommentDto> UpdateComment(int id, CommentUpdateDTO comment,string userId, bool isCustomer = true);
     }
 }

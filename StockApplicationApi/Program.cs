@@ -122,36 +122,30 @@ builder.Services.AddScoped<IRedisService, RedisClass>();
 builder.Services.AddScoped<IdentitySeeder>();
 
 var app = builder.Build();
+app.UseMiddleware<GlobalException>();
 
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.MapOpenApi(); 
-
+   
     app.UseSwaggerUI(options =>
     {
         // Add the forward slash here!
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Stock API v1");
     });
 }
+using (var scope = app.Services.CreateScope())
+{
 
-app.UseMiddleware<GlobalException>();
-
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+    var seeder = scope.ServiceProvider.GetRequiredService<IdentitySeeder>();
+    await seeder.SeedAdminAsync();
+}
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
-using (var scope = app.Services.CreateScope())
-{
-  
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate(); 
-    var seeder = scope.ServiceProvider.GetRequiredService<IdentitySeeder>();
-    await seeder.SeedAdminAsync();
-}
-
 app.Run();

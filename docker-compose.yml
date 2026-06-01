@@ -11,8 +11,8 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=stock_database;Username=admin;Password=secret_password_here
       - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false
-      - JWT__Issuer=http://localhost:8080/
-      - JWT__Audience=http://localhost:8080/
+      - JWT__Issuer=StockApplication
+      - JWT__Audience=StockApplication
       - JWT__SigningKey=7f8b9c2a5d1e4b3a8f6c0d9e8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b
     depends_on:
       postgres:

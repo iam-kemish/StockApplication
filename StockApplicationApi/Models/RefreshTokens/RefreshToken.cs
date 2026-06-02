@@ -9,6 +9,8 @@ namespace StockApplicationApi.Models.RefreshTokens
         public DateTime Expires { get; set; }
        
         public DateTime Created { get; set; }
+
+        public DateTime UsedAt { get; set; }
         public bool IsUsed { get; set; } = false;   
         public bool IsRevoked { get; set; } = false;
 

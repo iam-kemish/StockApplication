@@ -140,20 +140,26 @@ namespace StockApplicationApi.Services.AuthService
 
             if (storedToken == null)
                 throw new NotFoundException("Refresh Token not found.");
-            if(storedToken.IsUsed || storedToken.IsRevoked)
+            // Instead of immediate revocation on IsUsed:
+            if (storedToken.IsUsed )
             {
-                    await _IRefresh.RevokeAllTokens(storedToken.AppUserId);
-                 _logger.LogWarning("Refresh token {RefreshToken} for user {UserId} is invalid. It has been revoked or already used.", refreshToken, userId);
-                throw new UnAuthorizedException("Refresh token is invalid. It has been revoked.");
-            }
-               
+                var timeSinceFirstUse = DateTime.UtcNow - storedToken.UsedAt;
 
+                if (timeSinceFirstUse < TimeSpan.FromSeconds(5))
+                {
+                    // Almost certainly a network retry - just reject this request
+                    // but DON'T revoke anything
+                    throw new UnAuthorizedException("Token already used recently - retry with new token");
+                }
+                else
+                {
+                    // More than 5 seconds later - likely theft
+                    await _IRefresh.RevokeAllTokens(storedToken.AppUserId);
+                    throw new UnAuthorizedException("Suspicious activity detected");
+                }
+            }
             if (storedToken.AppUserId != userId) 
                 throw new UnAuthorizedException("Token user mismatch");
-
-        
-            if (storedToken.IsUsed)
-                throw new UnAuthorizedException("Refresh token has already been used.");
 
             if (storedToken.IsRevoked)
                 throw new UnAuthorizedException("Refresh token has been revoked.");
@@ -163,6 +169,7 @@ namespace StockApplicationApi.Services.AuthService
 
             // Mark as used (rotation)
             storedToken.IsUsed = true;
+            storedToken.UsedAt = DateTime.UtcNow;
             await _IRefresh.UpdateRefreshToken(storedToken);
 
             // Create new tokens
@@ -180,7 +187,10 @@ namespace StockApplicationApi.Services.AuthService
                 AppUserId = user.Id,
                 IsRevoked = false,
                 IsUsed = false,
+                Created = DateTime.UtcNow,
+               
             };
+
             await _IRefresh.SaveRefreshTokens(newToken);
 
             return new AuthResponseDTO

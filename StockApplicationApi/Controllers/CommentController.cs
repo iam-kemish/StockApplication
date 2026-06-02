@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.CommentDTOs;
@@ -40,6 +41,7 @@ namespace StockApplicationApi.Controllers
         }
         [HttpPost]
         [Authorize]
+        [EnableRateLimiting("FixedPolicy")]
         public async Task<IActionResult> Create([FromBody] CreateComment dto)
         {
             bool isCustomer  = User.IsInRole("Customer");

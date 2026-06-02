@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -21,6 +22,7 @@ using StockApplicationApi.Validators.Auth;
 using StockApplicationApi.Validators.Stocks;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +77,28 @@ builder.Services.AddAuthentication(options => {
     };
 
 });
+builder.Services.AddRateLimiter(options =>
+{
+// Define a Fixed Window Policy called "FixedPolicy"
+options.AddFixedWindowLimiter(policyName: "FixedPolicy", fixedOptions =>
+{
+    fixedOptions.PermitLimit = 2;                
+    fixedOptions.Window = TimeSpan.FromMinutes(1); 
+    fixedOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    fixedOptions.QueueLimit = 2;   
+});
+
+// Custom response when a limit is exceeded (HTTP 429 Too Many Requests)
+options.OnRejected = async (context, token) =>
+{
+context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+context.HttpContext.Response.ContentType = "application/json";
+    await context.HttpContext.Response.WriteAsync(
+        "{\"message\": \"Too many requests. Please try again later.\"}",
+        cancellationToken: token);
+};
+});
+
 
 builder.Services.AddSwaggerGen(option =>
 {
@@ -127,7 +151,7 @@ app.UseMiddleware<GlobalException>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-   
+    app.UseRateLimiter();
     app.UseSwaggerUI(options =>
     {
         // Add the forward slash here!

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Services.AuthService;
+using StockApplicationApi.Validators;
 using System.Net;
 
 namespace StockApplicationApi.Controllers
@@ -21,31 +23,10 @@ namespace StockApplicationApi.Controllers
             _validator = validator;
         }
         [HttpPost("Register")]
+        [ServiceFilter(typeof(ValidateFilter<RegisterDTO>))]
         public async Task<IActionResult> Register([FromBody] RegisterDTO dto)
         {
-            var validationResult = await _validator.ValidateAsync(dto);
-
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors
-                    .GroupBy(x => x.PropertyName)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.ErrorMessage).ToArray()
-                    );
-
-                return BadRequest(
-                    new APIResponse
-                    {
-                        Errors = errors,
-                        IsSuccess = false,
-                        statusCode = HttpStatusCode.BadRequest,
-                        Result = null,
-                        Message = "something went wrong."
-                    }
-
-                    );
-            }
+          
             var result = await _authService.Register(dto);
             return Ok(
                    new APIResponse

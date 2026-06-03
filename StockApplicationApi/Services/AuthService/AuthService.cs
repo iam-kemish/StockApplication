@@ -230,6 +230,8 @@ namespace StockApplicationApi.Services.AuthService
                     throw new UnAuthorizedException("Invalid token");
                 }
 
+                var jwtTokenAs = validatedToken as JwtSecurityToken;
+                
                 return principal;
             }
             catch (Exception ex)

@@ -1,14 +1,13 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Helpers;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Services.StockServices;
+using StockApplicationApi.Validators;
 using System.Net;
-using System.Security.Claims;
 
 namespace StockApplicationApi.Controllers
 {
@@ -32,24 +31,12 @@ namespace StockApplicationApi.Controllers
 
         [HttpPost]
         [Authorize]
+        [ServiceFilter(typeof(ValidateFilter<StockCreateDTO>))]
         public async Task<IActionResult> Create([FromBody] StockCreateDTO dto)
         {
             
             bool isAdmin = User.IsInRole("Admin");
-            var validationResult = await _createValidator.ValidateAsync(dto);
-
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors
-                    .GroupBy(x => x.PropertyName)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.ErrorMessage).ToArray()
-                    );
-
-                throw new AppValidationException(errors);
-            }
-
+          
             var createdStock = await _stockService.AddStock(dto, isAdmin);
 
             return CreatedAtAction(
@@ -81,23 +68,10 @@ namespace StockApplicationApi.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
+        [ServiceFilter(typeof(ValidateFilter<StockUpdateDTO>))]
         public async Task<IActionResult> Update(int id, [FromBody] StockUpdateDTO dto)
         {
-            
-            var validationResult = await _updateValidator.ValidateAsync(dto);
-
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors
-                    .GroupBy(x => x.PropertyName)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.ErrorMessage).ToArray()
-                    );
-
-                throw new AppValidationException(errors);
-            }
-
+           
             var updatedStock = await _stockService.UpdateStock(id, dto, isAdmin: User.IsInRole("Admin"));
 
             return Ok(new APIResponse
@@ -109,10 +83,7 @@ namespace StockApplicationApi.Controllers
             });
         }
 
-      
-
-        [HttpGet]
-    
+        [HttpGet]  
         public async Task<IActionResult> GetAll([FromQuery] StockQuery stockQuery)
         {
             var stocks = await _stockService.GetAllStocks(stockQuery);

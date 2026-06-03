@@ -2,12 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.CommentDTOs;
-using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Services.CommentServices;
-using StockApplicationApi.Services.StockServices;
+using StockApplicationApi.Validators;
 using System.Net;
 using System.Security.Claims;
 
@@ -42,33 +40,12 @@ namespace StockApplicationApi.Controllers
         [HttpPost]
         [Authorize]
         [EnableRateLimiting("FixedPolicy")]
+        [ServiceFilter(typeof(ValidateFilter<CreateComment>))]
         public async Task<IActionResult> Create([FromBody] CreateComment dto)
         {
             bool isCustomer  = User.IsInRole("Customer");
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var validationResult = await _CreateValidator.ValidateAsync(dto);
-
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors
-                    .GroupBy(x => x.PropertyName)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.ErrorMessage).ToArray()
-                    );
-
-                return BadRequest(
-                    new APIResponse
-                    {
-                        Errors = errors,
-                        IsSuccess = false,
-                        statusCode = HttpStatusCode.BadRequest,
-                        Result = null,
-                        Message = "something went wrong."
-                    }
-
-                    );
-            }
+           
             var createdComment =await _IComment.AddComment(dto, dto.StockId, userId!,isCustomer);
 
             return Ok(new APIResponse
@@ -96,24 +73,12 @@ namespace StockApplicationApi.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize]
+        [ServiceFilter(typeof(ValidateFilter<CommentUpdateDTO>))]
         public async Task<IActionResult> Update(int id, [FromBody] CommentUpdateDTO dto)
         {
             bool isCustomer  = User.IsInRole("Customer");
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var validationResult = await _UpdateValidator.ValidateAsync(dto);
-
-            if (!validationResult.IsValid)
-            {
-                var errors = validationResult.Errors
-                    .GroupBy(x => x.PropertyName)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.ErrorMessage).ToArray()
-                    );
-
-                throw new AppValidationException(errors);
-            }
-
+           
             var updatedStock = await _IComment.UpdateComment(id, dto, userId!, isCustomer);
 
             return Ok(new APIResponse

@@ -18,6 +18,7 @@ using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Services.RedisService;
 using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Services.Token;
+using StockApplicationApi.Validators;
 using StockApplicationApi.Validators.Auth;
 using StockApplicationApi.Validators.Stocks;
 using System.IdentityModel.Tokens.Jwt;
@@ -40,10 +41,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 // FluentValidation
-builder.Services.AddValidatorsFromAssemblyContaining<StockCreateDtoValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<StockUpdateDtoValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
-
+// Program.cs - This line does the same thing as your entire filter
+builder.Services.AddScoped(typeof(ValidateFilter<>));
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // Database & Identity
 builder.Services.AddDbContext<AppDbContext>(options =>

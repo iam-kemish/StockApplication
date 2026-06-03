@@ -6,6 +6,7 @@ using Moq;
 using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
+using StockApplicationApi.Models.RefreshTokens;
 using StockApplicationApi.Repositary.RefreshTokenRepositary;
 using StockApplicationApi.Services.AuthService;
 using StockApplicationApi.Services.Token;
@@ -18,11 +19,18 @@ namespace StockApplication.UnitTests.Services
         private readonly Mock<RoleManager<IdentityRole>> _roleManagerMock;
         private readonly Mock<ITokenService> _tokenServiceMock;
         private readonly Mock<IRefreshToken> _refreshTokenMock;
-     private readonly Mock<IConfiguration> _mockConfiguration;
+        private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly AuthService _sut;
         private readonly Mock<ILogger<AuthService>> _mockLogger;
         public AuthServiceTests()
         {
+            _mockConfiguration = new Mock<IConfiguration>();
+
+     
+            _mockConfiguration.Setup(x => x["JWT:Issuer"]).Returns("https://test.com");
+            _mockConfiguration.Setup(x => x["JWT:Audience"]).Returns("https://test.com");
+            _mockConfiguration.Setup(x => x["JWT:SigningKey"]).Returns("this-is-a-32-character-test-key-for-jwt");
+
             _userManagerMock = new Mock<UserManager<AppUser>>(
                 Mock.Of<IUserStore<AppUser>>(), null, null, null, null, null, null, null, null);
             _roleManagerMock = new Mock<RoleManager<IdentityRole>>(
@@ -30,8 +38,13 @@ namespace StockApplication.UnitTests.Services
             _tokenServiceMock = new Mock<ITokenService>();
             _refreshTokenMock = new Mock<IRefreshToken>();
             _mockLogger = new Mock<ILogger<AuthService>>();
-            _mockConfiguration = new Mock<IConfiguration>();
-            _sut = new AuthService(_userManagerMock.Object, _roleManagerMock.Object, _tokenServiceMock.Object, _mockLogger.Object, _refreshTokenMock.Object, _mockConfiguration.Object);
+           
+            _sut = new AuthService(
+                _userManagerMock.Object,
+                _roleManagerMock.Object,
+                _tokenServiceMock.Object,
+                _mockLogger.Object, _refreshTokenMock.Object,
+                _mockConfiguration.Object);
         }
         [Fact]
         public async Task Register_ShouldThrowConflictException_WhenEmailAlreadyExists()
@@ -173,7 +186,7 @@ namespace StockApplication.UnitTests.Services
             };
             var user = new AppUser { Email = dto.Email, UserName = "User" };
             _userManagerMock.Setup(u => u.FindByEmailAsync(dto.Email)).ReturnsAsync(user);
-                        _userManagerMock.Setup(u => u.CheckPasswordAsync(user, dto.Password)).ReturnsAsync(true);
+            _userManagerMock.Setup(u => u.CheckPasswordAsync(user, dto.Password)).ReturnsAsync(true);
             _tokenServiceMock.Setup(t => t.CreateAccessToken(user)).ReturnsAsync("token");
 
             var result = await _sut.Login(dto);
@@ -182,6 +195,7 @@ namespace StockApplication.UnitTests.Services
             Assert.Equal(user.Email, result.Email);
             Assert.Equal("token", result.Token);
         }
-    }
-}
     
+        }
+
+    }

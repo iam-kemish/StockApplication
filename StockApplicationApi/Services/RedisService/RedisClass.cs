@@ -17,37 +17,66 @@ namespace StockApplicationApi.Services.RedisService
     
         public async Task<T> GetDatasAsync<T>(string key)
         {
-           var value =await _Db.StringGetAsync(key);
-            if (value.IsNullOrEmpty)
+            try
             {
+                var value = await _Db.StringGetAsync(key);
+                if (value.IsNullOrEmpty)
+                {
+                    return default!;
+                }
+                return JsonSerializer.Deserialize<T>(value!)!;
+            }catch (RedisCommandException )
+            {
+              
                 return default!;
             }
-            return JsonSerializer.Deserialize<T>(value!)!;
         }
         public async Task RemoveByPrefixAsync(string prefix)
         {
-          
-            var endpoints = _redis.GetEndPoints();
-            var server = _redis.GetServer(endpoints[0]);
+            try
+            {
+                var allKeys = new HashSet<RedisKey>();
 
-            var keys = server.Keys(pattern: $"{prefix}*").ToArray();
-            if (keys.Any())
-                await _Db.KeyDeleteAsync(keys);
+                foreach (var endpoint in _redis.GetEndPoints())
+                {
+                    var server = _redis.GetServer(endpoint);
+                    var PrefixSet = server.KeysAsync(pattern: $"{prefix}*");
+                    await foreach (var key in PrefixSet)
+                        allKeys.Add(key);
+                }
 
+                if (allKeys.Count > 0)
+                    await _Db.KeyDeleteAsync(allKeys.ToArray());
+            }
+            catch (RedisException)
+            {
+              
+            }
         }
-
         public async Task<bool> RemoveDataAsync(string key)
         {
-           
-         return await _Db.KeyDeleteAsync(key);
-            
-        }
 
+            try
+            {
+                return await _Db.KeyDeleteAsync(key);
+            } catch (RedisConnectionException)
+            {
+                return default!;
+            }
+
+        }
+        
         public async Task<bool> SetDataAsync<T>(string key, T data, TimeSpan expiration )
         {
-           
-            var jsonData = JsonSerializer.Serialize(data);
-            return await _Db.StringSetAsync(key, jsonData, expiration);
+            try
+            {
+                var jsonData = JsonSerializer.Serialize(data);
+                return await _Db.StringSetAsync(key, jsonData, expiration);
+            }
+            catch (RedisCommandException)
+            {
+                return default!;
+            }
         } 
     }
 }

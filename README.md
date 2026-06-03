@@ -6,12 +6,15 @@
      Create/read/update/delete stocks
      Post comments about specific stocks
      Each comment is tied to a user (no anonymous posting)
+     Users are allowed limited comments for certain time
      Users can only edit/delete their OWN comments
+     Server-side Pagination & Sorting on stocks and comments so the API doesn't choke on big data.
 
 -Technology used
-     .NET 9	The framework
-     Entity Framework Core which talks to SQL Server
-     Redis	Caching so I don't hit DB for every request
+     .NET 9
+     Entity Framework Core which talks to PostgreSQL
+     Docker & Docker Compose - Runs the app,redis and db containers
+     Redis Caching so I don't hit DB for every request
      ASP.NET Core Identity	Handles user registration/login
      JWT	Access tokens
       Refresh tokens (DB stored)
@@ -58,7 +61,6 @@ Some of Security stuffs I added
 -What I test:
     "Add comment on non-existent stock" → throws exception
     "User tries to update someone else's comment" → unauthorized
-    "Refresh token mismatch" → rejects
     
 -API endpoints (main ones)
     Method	Endpoint	What
@@ -75,13 +77,9 @@ Some of Security stuffs I added
 -Using SQL Server for database.
 
 How to run this
-Install SQL Server and Redis (or use Docker)
-
-Update appsettings.json with your connection strings
-
-Run migrations: dotnet ef database update
-
-Run: dotnet run
+-Make sure you have "Docker Desktop" installed and running.
+-Clone the project and open the root terminal.
+-Run this command "docker compose up --build -d"
 
 Test with Swagger at /swagger or use Postman
 

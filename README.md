@@ -1,85 +1,75 @@
--StockApplicationApi
-     A stock discussion API where users can post comments about stocks.
+# StockApplicationApi 
+A stock discussion API where users can post comments about stocks.
 
--What this thing actually does-
-     Users can register/login (JWT tokens)
-     Create/read/update/delete stocks
-     Post comments about specific stocks
-     Each comment is tied to a user (no anonymous posting)
-     Users are allowed limited comments for certain time
-     Users can only edit/delete their OWN comments
-     Server-side Pagination & Sorting on stocks and comments so the API doesn't choke on big data.
+### What this thing actually does
+* Users can register/login (JWT tokens).
+* Create, read, update, and delete stocks.
+* Post comments about specific stocks.
+* Each comment is tied to a user (no anonymous posting).
+* Users are allowed limited comments for a certain time (Rate Limited).
+* Users can only edit or delete their **OWN** comments.
+* Server-side Pagination & Sorting on stocks and comments so the API doesn't choke on big data.
 
--Technology used
-     .NET 9
-     Entity Framework Core which talks to PostgreSQL
-     Docker & Docker Compose - Runs the app,redis and db containers
-     Redis Caching so I don't hit DB for every request
-     ASP.NET Core Identity	Handles user registration/login
-     JWT	Access tokens
-      Refresh tokens (DB stored)
-      xUnit + Moq	Unit tests for service layer
-      FluentValidation Validates incoming requests
+### Technology used 
+* **.NET 9** - Core framework
+* **Entity Framework Core** - Talks to **PostgreSQL** (or SQL Server, pick your actual DB here!)
+* **Docker & Docker Compose** - Runs the app, Redis, and database containers seamlessly
+* **Redis Caching** - Keeps things fast so I don't hit the DB for every request
+* **ASP.NET Core Identity** - Handles user registration and logins
+* **JWT** - Access tokens + Refresh tokens (stored in the DB)
+* **xUnit + Moq** - Unit tests specifically for the service layer
+* **FluentValidation** - Validates incoming HTTP requests automatically
 
--How it's built (layers)
+### How it's built (layers)
+Controller →   Service    →      Repository
+↓              ↓                 ↓
+DTOs       Business logic      Database
 
-     Controller →   Service    →      Repository 
-        ↓              ↓                 ↓
-       DTOs       Business logic      Database
-     Controllers - Just receive requests, call services, return responses
-     Services - All the business logics. (checking if stock exists, user owns comment, etc.)
-     Repositories - Just database CRUD operations (add, update, delete, find)
-     DTOs - What goes in/out of API(to user) (hides database models)
+* **Controllers:** Just receive requests, call services, and return responses.
+* **Services:** All the core business logic lives here (checking if a stock exists, checking if a user actually owns the comment they are trying to edit, etc.).
+* **Repositories:** Handles raw database operations (add, update, delete, find).
+* **DTOs:** Data Transfer Objects. What goes in and out of the API to the user, completely hiding internal database models.
 
+### Security Features
+* **Refresh token rotation with breach detection**
+  * When you request a new access token using a refresh token, the old refresh token gets marked as "used" immediately.
+  * You receive a brand new refresh token back.
+  * If an attacker tries to replay and use that **SAME** old refresh token again, the system automatically detects it and instantly revokes **ALL** active tokens for that user.
+* **Validation at 3 levels**
+  1. **FluentValidation:** Checks basic request data formats (e.g., "Stock symbol can't be empty").
+  2. **Service layer custom checks:** Enforces business rules (e.g., "Can't comment on non-existent stock").
+  3. **Global exception handler:** A middleware that catches anything unexpected (like DB connection failures) so the app doesn't leak raw stack traces.
 
-Some of Security stuffs I added
-    -Refresh token rotation with breach detection
-    -When you request a new access token using a refresh token:
-    -Old refresh token gets marked as "used" immediately
-    -You get a brand new refresh token
-    -If someone tries to use the SAME refresh token again (attacker trying to replay) → system detects it and revokes ALL tokens for that user.
--Validation at 3 levels
-    FluentValidation - Checks request data (e.g., "Stock symbol can't be empty")
-    Service layer custom checks - Business rules (e.g., "Can't comment on non-existent stock")
-    Global exception handler - Catches anything unexpected (DB connection fails, etc.)
+### Redis Caching Strategy
+* **When you hit `GET /api/stocks` or `/api/comments`:**
+  * Checks Redis first. If the data exists, it returns straight from the cache (~5ms).
+  * If it's a cache miss, it hits the database (~50ms), returns the data, and stores the result inside Redis for 10 minutes.
+* **When you hit a write command (`POST`/`PUT`/`DELETE`):**
+  * It updates the database first, then deletes the relevant cache keys by prefix so the very next `GET` request is forced to pull fresh data from the DB.
 
--Redis caching
-    When you GET /api/stocks or /api/comments:
-    Checks Redis first
-    If data exists → returns from cache (~5ms)
-    If not → hits database (~50ms), stores result for 10 minutes
-    When you POST/PUT/DELETE (anything that changes data):
-    Updates database
-    Deletes relevant cache keys by prefix so next GET refreshes from DB
+### Performance & Testing
+* **Async everywhere:** All database calls, Redis calls, and HTTP pipeline operations use `async`/`await`. No blocking threads.
+* **Testing approach:** I specifically unit tested the service layer where the actual business logic lives, rather than testing basic repository CRUD operations.
+  * *Test cases cover:* "Add comment on non-existent stock throws exception" and "User tries to update someone else's comment returns unauthorized".
 
--Async everywhere
-    All database calls, Redis calls, and HTTP calls use async/await. No blocking threads.
+### Main API Endpoints
 
--Testing approach
-    unit tested service layer (where business logic lives), not repositories.
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| **POST** | `/api/account/register` | Create a new user account |
+| **POST** | `/api/account/login` | Get access token + refresh token |
+| **POST** | `/api/account/refresh` | Get a clean token pair using a valid refresh token |
+| **GET** | `/api/stock` | List all stocks (with Pagination, Sorting, and **Cached**) |
+| **GET** | `/api/stock/{id}` | Get single stock details |
+| **POST** | `/api/stock` | Create a stock (Admin authorization required) |
+| **GET** | `/api/comment/{stockId}` | Comments for a stock (with Pagination and **Cached**) |
+| **POST** | `/api/comment/{stockId}` | Add a comment (Requires authentication + **Rate-Limited**) |
+| **PUT** | `/api/comment/{commentId}` | Edit your own comment |
 
--What I test:
-    "Add comment on non-existent stock" → throws exception
-    "User tries to update someone else's comment" → unauthorized
-    
--API endpoints (main ones)
-    Method	Endpoint	What
-    POST	/api/account/register	Create account
-    POST	/api/account/login	Get access token + refresh token
-    POST	/api/account/refresh	Get new tokens using refresh token
-    GET	/api/stock	List all stocks (cached)
-    GET	/api/stock/{id}	Single stock details
-    POST	/api/stock	Create stock (admin only)
-    GET	/api/comment/{stockId}	Comments for a stock (cached)
-    POST	/api/comment/{stockId}	Add comment (requires login)
-    PUT	/api/comment/{commentId}	Edit your own comment
- 
--Using SQL Server for database.
+### How to run this locally
 
-How to run this
--Make sure you have "Docker Desktop" installed and running.
--Clone the project and open the root terminal.
--Run this command "docker compose up --build -d"
-
-Test with Swagger at /swagger or use Postman
-
+1. Make sure you have **Docker Desktop** installed and running on your machine.
+2. Clone this project repository and open your terminal in the root directory.
+3. Run the following command to spin up the API, database, and Redis instances automatically:
+   ```bash
+   docker compose up --build -d

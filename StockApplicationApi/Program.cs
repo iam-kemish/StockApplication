@@ -19,8 +19,6 @@ using StockApplicationApi.Services.RedisService;
 using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Services.Token;
 using StockApplicationApi.Validators;
-using StockApplicationApi.Validators.Auth;
-using StockApplicationApi.Validators.Stocks;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Threading.RateLimiting;
@@ -79,13 +77,15 @@ builder.Services.AddAuthentication(options => {
 });
 builder.Services.AddRateLimiter(options =>
 {
-// Define a Fixed Window Policy called "FixedPolicy"
-options.AddFixedWindowLimiter(policyName: "FixedPolicy", fixedOptions =>
+    options.RejectionStatusCode  = StatusCodes.Status429TooManyRequests;
+    
+    options.AddTokenBucketLimiter(policyName: "BucketPolicy", opt =>
 {
-    fixedOptions.PermitLimit = 2;                
-    fixedOptions.Window = TimeSpan.FromMinutes(1); 
-    fixedOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-    fixedOptions.QueueLimit = 2;   
+    opt.TokenLimit = 100;         // Max capacity a user can hold for bursts
+    opt.TokensPerPeriod = 10;     // Refill a small amount...
+    opt.ReplenishmentPeriod = TimeSpan.FromSeconds(6); // ...very frequently (100/min total)
+    opt.AutoReplenishment = true;
+    opt.QueueLimit = 0;
 });
 
 // Custom response when a limit is exceeded (HTTP 429 Too Many Requests)

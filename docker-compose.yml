@@ -1,5 +1,6 @@
 ﻿version: '3.4'
 services:
+
   stockapplicationapi:
     image: ${DOCKER_REGISTRY-}stockapplicationapi
     build:
@@ -9,11 +10,10 @@ services:
       - "8080:8080"
       - "8081:8081"
     environment:
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=stock_database;Username=admin;Password=secret_password_here
-      - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false
-      - JWT__Issuer=StockApplication
-      - JWT__Audience=StockApplication
-      - JWT__SigningKey=7f8b9c2a5d1e4b3a8f6c0d9e8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - JWT__SigningKey=${JWT_SIGNING_KEY}
+      - JWT__Issuer=${JWT_ISSUER}
+      - JWT__Audience=${JWT_AUDIENCE}
     depends_on:
       postgres:
         condition: service_healthy   # ← waits for postgres to be TRULY ready
@@ -31,15 +31,15 @@ services:
     image: postgres:16-alpine
     container_name: stockapp-db
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret_password_here
-      POSTGRES_DB: stock_database
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # ports:
+    #   - "5432:5432"
     volumes:
       - postgresData:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d stock_database"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 5s       # check every 5 seconds
       timeout: 5s        # wait max 5s for response
       retries: 5         # try 5 times before giving up
@@ -48,8 +48,8 @@ services:
   redis:
     image: redis:7-alpine
     container_name: stockapp-cache
-    ports:
-      - "6379:6379"
+    # ports:
+    #   - "6379:6379"
 
 volumes:
   postgresData:

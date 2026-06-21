@@ -39,7 +39,7 @@ namespace StockApplicationApi.Controllers
         }
         [HttpPost]
         [Authorize]
-        [EnableRateLimiting("FixedPolicy")]
+        [EnableRateLimiting("BucketPolicy")]
         [ServiceFilter(typeof(ValidateFilter<CreateComment>))]
         public async Task<IActionResult> Create([FromBody] CreateComment dto)
         {

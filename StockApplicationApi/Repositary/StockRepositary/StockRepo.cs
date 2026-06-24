@@ -14,25 +14,25 @@ namespace StockApplicationApi.Repositary.StockRepositary
         {
             _Db = appDbContext;
         }
-        public async Task AddStock(Stock Stock)
+        public async Task AddStock(Stock Stock, CancellationToken cancellationToken= default)
         {
             _Db.Stocks.Add(Stock);
-          await  _Db.SaveChangesAsync();
+          await  _Db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task UpdateStock(Stock Stock)
+        public async Task UpdateStock(Stock Stock, CancellationToken cancellationToken= default)
         {
             _Db.Stocks.Update(Stock);
-            await _Db.SaveChangesAsync();
+            await _Db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task DeleteStock(Stock Stock)
+        public async Task DeleteStock(Stock Stock, CancellationToken cancellationToken= default)
         {
             _Db.Stocks.Remove(Stock);
-           await _Db.SaveChangesAsync();
+           await _Db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Stock>> GetAllStocks(StockQuery stockQuery)
+        public async Task<IEnumerable<Stock>> GetAllStocks(StockQuery stockQuery, CancellationToken cancellationToken= default)
         {
             var query = _Db.Stocks.Include(p => p.Comments).AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(stockQuery.CompanyName))
@@ -56,10 +56,10 @@ namespace StockApplicationApi.Repositary.StockRepositary
             }
             var skipNumber = (stockQuery.PageNumber - 1) * stockQuery.PageSize;
 
-            return await query.Skip(skipNumber).Take(stockQuery.PageSize).ToListAsync();
+            return await query.Skip(skipNumber).Take(stockQuery.PageSize).ToListAsync(cancellationToken);
         }
 
-        public Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null, bool tracking = false)
+        public Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null, CancellationToken cancellationToken = default, bool tracking = false)
         {
             var query = _Db.Stocks.Include(p => p.Comments).AsQueryable();
             if (!tracking)
@@ -70,14 +70,14 @@ namespace StockApplicationApi.Repositary.StockRepositary
             {
                 query = query.Where(filter);
             }
-            return query.FirstOrDefaultAsync();
+            return query.FirstOrDefaultAsync(cancellationToken);
         }
 
     
 
-        public Task<bool> StockExists(int id)
+        public Task<bool> StockExists(int id, CancellationToken cancellationToken= default)
         {
-            return _Db.Stocks.AnyAsync(u => u.Id == id);
+            return _Db.Stocks.AnyAsync(u => u.Id == id, cancellationToken);
         }
 
         

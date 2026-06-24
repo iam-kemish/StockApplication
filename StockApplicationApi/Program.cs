@@ -143,7 +143,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRedisService, RedisClass>();
 builder.Services.AddScoped<IdentitySeeder>();
-
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 var app = builder.Build();
 app.UseMiddleware<GlobalException>();
 

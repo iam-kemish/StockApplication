@@ -6,12 +6,11 @@ namespace StockApplicationApi.Repositary.StockRepositary
 {
     public interface IStock
     {
-        Task<IEnumerable<Stock>> GetAllStocks(StockQuery stockQuery);
-
-        Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null,  bool tracking = false);
-        Task AddStock(Stock Stock);
-       Task UpdateStock(Stock Stock);
-        Task DeleteStock(Stock Stock);
-        Task<bool> StockExists(int id);
+        Task AddStock(Stock stock, CancellationToken cancellationToken = default);
+        Task UpdateStock(Stock stock, CancellationToken cancellationToken = default);
+        Task DeleteStock(Stock stock, CancellationToken cancellationToken = default);
+        Task<IEnumerable<Stock>> GetAllStocks(StockQuery stockQuery, CancellationToken cancellationToken = default);
+        Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null, CancellationToken cancellationToken = default, bool tracking = false);
+        Task<bool> StockExists(int id, CancellationToken cancellationToken = default);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StockApplicationApi.Exceptions;
+using StockApplicationApi.Features.Stocks.Queries;
 using StockApplicationApi.Helpers;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.StockDTOs;
@@ -15,6 +17,7 @@ namespace StockApplicationApi.Controllers
     [ApiController]
     public class StockController : ControllerBase
     {
+        private readonly IMediator _IMediatr;
         private readonly IStockService _stockService;
         private readonly IValidator<StockCreateDTO> _createValidator;
         private readonly IValidator<StockUpdateDTO> _updateValidator;
@@ -22,8 +25,10 @@ namespace StockApplicationApi.Controllers
         public StockController(
             IStockService stockService,
             IValidator<StockCreateDTO> createValidator,
-            IValidator<StockUpdateDTO> updateValidator)
+            IValidator<StockUpdateDTO> updateValidator,
+            IMediator mediator)
         {
+            _IMediatr = mediator;
             _stockService = stockService;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
@@ -54,10 +59,11 @@ namespace StockApplicationApi.Controllers
 
         [HttpGet("{id}")]
         [Authorize]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
             
-            var stock = await _stockService.GetStockById(id);
+            var query = new GetStockById(id);
+            var stock = await _IMediatr.Send(query, cancellationToken);
             return Ok(new APIResponse
             {
                 IsSuccess = true,
@@ -84,9 +90,10 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpGet]  
-        public async Task<IActionResult> GetAll([FromQuery] StockQuery stockQuery)
+        public async Task<IActionResult> GetAll([FromQuery] StockQuery stockQuery, CancellationToken cancellationToken)
         {
-            var stocks = await _stockService.GetAllStocks(stockQuery);
+            var query = new GetAllStocksQuery(stockQuery);
+            var stocks = await _IMediatr.Send(query, cancellationToken);
 
             return Ok(new APIResponse
             {

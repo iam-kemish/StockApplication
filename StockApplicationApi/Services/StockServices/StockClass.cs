@@ -79,44 +79,24 @@ namespace StockApplicationApi.Services.StockServices
             _logger.LogInformation("Cache removed successfully after deleting stock with ID: {StockId}", id);
         }
 
-        public async Task<IEnumerable<StockDTO>> GetAllStocks(StockQuery stockQuery)
-        {
-            string GetCachekey = CacheKeys.GetStockListKey(stockQuery);
-            var cachedStocks = await _cache.GetDatasAsync<IEnumerable<StockDTO>>(GetCachekey);
-            if (cachedStocks != null)
-            {
-                _logger.LogInformation("Retrieved all stocks from cache");
-                return cachedStocks;
-            }
+        //public async Task<IEnumerable<StockDTO>> GetAllStocks(StockQuery stockQuery)
+        //{
+        //    string GetCachekey = CacheKeys.GetStockListKey(stockQuery);
+        //    var cachedStocks = await _cache.GetDatasAsync<IEnumerable<StockDTO>>(GetCachekey);
+        //    if (cachedStocks != null)
+        //    {
+        //        _logger.LogInformation("Retrieved all stocks from cache");
+        //        return cachedStocks;
+        //    }
 
-            var stocks = await _IStock.GetAllStocks(stockQuery);
-            _logger.LogInformation("Retrieved all stocks");
-            var resultedStocks = _IMapper.Map<IEnumerable<StockDTO>>(stocks);
-            await _cache.SetDataAsync(GetCachekey, resultedStocks, TimeSpan.FromMinutes(5));
-            return resultedStocks;
-        }
+        //    var stocks = await _IStock.GetAllStocks(stockQuery);
+        //    _logger.LogInformation("Retrieved all stocks");
+        //    var resultedStocks = _IMapper.Map<IEnumerable<StockDTO>>(stocks);
+        //    await _cache.SetDataAsync(GetCachekey, resultedStocks, TimeSpan.FromMinutes(5));
+        //    return resultedStocks;
+        //}
 
-        public async Task<StockDTO> GetStockById(int id)
-        {
-          
-            var cachedStock = await _cache.GetDatasAsync<StockDTO>(CacheKeys.StockDetail(id));
-            if (cachedStock != null)
-            {
-                _logger.LogInformation("Stock with ID: {StockId} retrieved from cache", id);
-                return cachedStock;
-            }
-            //If no cache, get from database
-            _logger.LogInformation("Stock with ID: {StockId} not found in cache, retrieving from database", id);
-            var stock = await _IStock.GetStock(u => u.Id == id);
-            if (stock == null)
-            {
-                _logger.LogWarning("Attempt to retrieve a non-existent stock with ID: {StockId}", id);
-                throw new NotFoundException("Does this Stock exists?");
-            }
-            await _cache.SetDataAsync(CacheKeys.StockDetail(id), _IMapper.Map<StockDTO>(stock), TimeSpan.FromMinutes(5));
-            return _IMapper.Map<StockDTO>(stock);
-        }
-
+     
         public async Task<StockDTO> UpdateStock(int id, StockUpdateDTO stock,  bool isAdmin = true)
         {           
             if (!isAdmin)

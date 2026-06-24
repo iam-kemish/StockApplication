@@ -16,12 +16,10 @@ using StockApplicationApi.Seeders;
 using StockApplicationApi.Services.AuthService;
 using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Services.RedisService;
-using StockApplicationApi.Services.StockServices;
 using StockApplicationApi.Services.Token;
 using StockApplicationApi.Validators;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -135,7 +133,7 @@ var redisConnection = builder.Configuration.GetConnectionString("RedisConnection
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection!));
 builder.Services.AddAutoMapper(typeof(MapConfig));
 builder.Services.AddScoped<IStock, StockRepo>();
-builder.Services.AddScoped<IStockService, StockClass>();
+
 builder.Services.AddScoped<IComment, CommentClass>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IRefreshToken, RefreshTokenClass>();

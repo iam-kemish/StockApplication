@@ -40,8 +40,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Stocks\Commands\" />
-  </ItemGroup>
-
 </Project>

@@ -15,7 +15,7 @@ namespace StockApplicationApi.Features.Stocks.Handlers
         private readonly ILogger<UpdateStockHandler> _logger;
         private readonly IRedisService _cache;
         private readonly IMapper _IMapper;
-
+     
         public UpdateStockHandler(IStock IStock, ILogger<UpdateStockHandler> logger, IRedisService cache, IMapper mapper)
         {
             _IStock = IStock;
@@ -24,6 +24,7 @@ namespace StockApplicationApi.Features.Stocks.Handlers
             _IMapper = mapper;
         }
 
+      
         public async Task<StockDTO> Handle(UpdateStockCommand request, CancellationToken cancellationToken)
         {
             if (!request.isAdmin)

@@ -1,9 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using StockApplicationApi.Exceptions;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs;
-using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Services.AuthService;
 using StockApplicationApi.Validators;
 using System.Net;

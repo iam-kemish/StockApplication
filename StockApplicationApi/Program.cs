@@ -14,7 +14,6 @@ using StockApplicationApi.Repositary.RefreshTokenRepositary;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Seeders;
 using StockApplicationApi.Services.AuthService;
-using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Services.RedisService;
 using StockApplicationApi.Services.Token;
 using StockApplicationApi.Validators;
@@ -135,7 +134,6 @@ builder.Services.AddAutoMapper(typeof(MapConfig));
 builder.Services.AddScoped<IStock, StockRepo>();
 
 builder.Services.AddScoped<IComment, CommentClass>();
-builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IRefreshToken, RefreshTokenClass>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();

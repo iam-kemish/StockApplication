@@ -13,23 +13,23 @@ namespace StockApplicationApi.Repositary.CommentRepositary
         {
             _context = appDbContext;
         }
-        public async Task AddComment(Comment comment)
+        public async Task AddComment(Comment comment, CancellationToken cancellationToken = default)
         {
             _context.Comments.Add(comment);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Comment>> GetAllComments(Expression<Func<Comment, bool>>? filter = null)
+        public async Task<IEnumerable<Comment>> GetAllComments(Expression<Func<Comment, bool>>? filter = null, CancellationToken cancellationToken = default)
         {
             var query = _context.Comments.AsNoTracking().AsQueryable();
             if (filter != null)
             {
                 query = query.Where(filter);
             }
-            return await query.ToListAsync();
+            return await query.ToListAsync(cancellationToken);
         }
 
-        public Task<Comment?> GetComment(Expression<Func<Comment, bool>>? filter = null, bool tracking = false)
+        public Task<Comment?> GetComment(Expression<Func<Comment, bool>>? filter = null, bool tracking = false, CancellationToken cancellationToken = default)
         {
             var query = _context.Comments.AsNoTracking().AsQueryable();
             if (!tracking)
@@ -40,13 +40,13 @@ namespace StockApplicationApi.Repositary.CommentRepositary
             {
                 query = query.Where(filter);
             }
-            return query.FirstOrDefaultAsync();
+            return query.FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task UpdateComment(Comment comment)
+        public async Task UpdateComment(Comment comment, CancellationToken cancellationToken = default)
         {
            _context.Comments.Update(comment);
-           await _context.SaveChangesAsync();
+           await _context.SaveChangesAsync(cancellationToken);
 
         }
     }

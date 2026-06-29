@@ -18,8 +18,8 @@ namespace StockApplication.UnitTests.Features.Stocks
     {
         private readonly Mock<IStock> _mockRepo;
         private readonly IMapper _Imapper;
-        private readonly UpdateStockHandler _handler;
-        private readonly Mock<ILogger<UpdateStockHandler>> _mockLogger;
+        private readonly UpdateCommentHandler _handler;
+        private readonly Mock<ILogger<UpdateCommentHandler>> _mockLogger;
         private readonly Mock<IRedisService> _mockRedisService;
         public UpdateStockHandlerTests()
         {
@@ -30,7 +30,7 @@ namespace StockApplication.UnitTests.Features.Stocks
                 cfg.AddProfile<MapConfig>();
             });
             _Imapper = config.CreateMapper();
-            _mockLogger = new Mock<ILogger<UpdateStockHandler>>();
+            _mockLogger = new Mock<ILogger<UpdateCommentHandler>>();
             _mockRedisService = new Mock<IRedisService>();
             _handler = new UpdateStockHandler(_mockRepo.Object, _mockLogger.Object, _mockRedisService.Object, _Imapper);
         }
@@ -47,7 +47,7 @@ namespace StockApplication.UnitTests.Features.Stocks
 
             // ACT
             var ex = await Assert.ThrowsAsync<NotFoundException>(
-                () => _handler.Handle(new UpdateStockCommand(id, stockUpdateDTO), default)
+                () => _handler.Handle(new UpdateCommentCommand(id, stockUpdateDTO), default)
             );
 
             // ASSERT
@@ -87,7 +87,7 @@ namespace StockApplication.UnitTests.Features.Stocks
             _mockRedisService.Setup(r => r.RemoveByPrefixAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
             //_mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
             //  .Returns(new StockDTO());
-            await _handler.Handle(new UpdateStockCommand(id, stockUpdateDTO), default);
+            await _handler.Handle(new UpdateCommentCommand(id, stockUpdateDTO), default);
 
             Assert.NotNull(existingStock);
             Assert.Equal("Tesla Updated", existingStock.CompanyName);

@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using StockApplicationApi.Features.Comments.Commands;
+using StockApplicationApi.Features.Comments.Queries;
 using StockApplicationApi.Models;
 using StockApplicationApi.Models.DTOs.CommentDTOs;
-using StockApplicationApi.Services.CommentServices;
 using StockApplicationApi.Validators;
 using System.Net;
 using System.Security.Claims;
@@ -15,21 +17,24 @@ namespace StockApplicationApi.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
-        private readonly ICommentService _IComment;
+      
         private readonly IValidator<CreateComment> _CreateValidator;
         private readonly IValidator<CommentUpdateDTO> _UpdateValidator;
-        public CommentController(ICommentService commentService, IValidator<CreateComment> validator, IValidator<CommentUpdateDTO> UpdateValidator)
+        private readonly IMediator _IMediatr;
+
+        public CommentController(IValidator<CreateComment> validator, IValidator<CommentUpdateDTO> UpdateValidator, IMediator mediatr)
         {
-            _IComment = commentService;
+        
             _CreateValidator = validator;
             _UpdateValidator = UpdateValidator;
+            _IMediatr = mediatr;
         }
         [HttpGet]
        
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            var comments = await _IComment.GetAllComments();
-
+            var query = new GetAllCommentsQuery();
+            var comments = await _IMediatr.Send(query, cancellationToken);
             return Ok(new APIResponse
             {
                 IsSuccess = true,
@@ -37,32 +42,34 @@ namespace StockApplicationApi.Controllers
                 Result = comments
             });
         }
-        [HttpPost]
+        [HttpPost("{StockId:int}")]
         [Authorize]
         [EnableRateLimiting("BucketPolicy")]
         [ServiceFilter(typeof(ValidateFilter<CreateComment>))]
-        public async Task<IActionResult> Create([FromBody] CreateComment dto)
+        public async Task<IActionResult> Create([FromBody] CreateComment dto,[FromRoute] int StockId, CancellationToken cancellationToken)
         {
             bool isCustomer  = User.IsInRole("Customer");
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-           
-            var createdComment =await _IComment.AddComment(dto, dto.StockId, userId!,isCustomer);
+            
+            var query = new AddCommentCommand(dto,StockId, userId!, isCustomer);
+            var comment = await _IMediatr.Send(query, cancellationToken);
 
             return Ok(new APIResponse
             {
                 IsSuccess = true,
                 statusCode = HttpStatusCode.Created,
                 Message = "Comment created successfully",
-                Result = createdComment
+                Result = comment
             }
              );    
         }
         [HttpGet("{id:int}")]
         [Authorize]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-           
-            var comment = await _IComment.GetCommentById(id);
+
+            var query = new GetCommentById(id);
+            var comment = await _IMediatr.Send(query, cancellationToken);
             return Ok(new APIResponse
             {
                 IsSuccess = true,
@@ -74,19 +81,20 @@ namespace StockApplicationApi.Controllers
         [HttpPut("{id:int}")]
         [Authorize]
         [ServiceFilter(typeof(ValidateFilter<CommentUpdateDTO>))]
-        public async Task<IActionResult> Update(int id, [FromBody] CommentUpdateDTO dto)
+        public async Task<IActionResult> Update(int id, [FromBody] CommentUpdateDTO dto, CancellationToken cancellationToken)
         {
             bool isCustomer  = User.IsInRole("Customer");
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var query = new UpdateCommentCommand(id, dto, userId!, isCustomer);
+            var comment = await _IMediatr.Send(query, cancellationToken);
            
-            var updatedStock = await _IComment.UpdateComment(id, dto, userId!, isCustomer);
 
             return Ok(new APIResponse
             {
                 IsSuccess = true,
                 statusCode = HttpStatusCode.OK,
                 Message = "Comment updated successfully",
-                Result = updatedStock
+                Result = comment
             });
         }
     }

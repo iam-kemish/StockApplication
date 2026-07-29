@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using StockApplicationApi.Exceptions;
+using StockApplicationApi.Features.Comments.Handlers;
 using StockApplicationApi.Features.Stocks.Commands;
 using StockApplicationApi.Features.Stocks.Handlers;
 using StockApplicationApi.Mapper;
@@ -10,7 +11,6 @@ using StockApplicationApi.Models.DTOs.StockDTOs;
 using StockApplicationApi.Repositary.StockRepositary;
 using StockApplicationApi.Services.RedisService;
 using System.Linq.Expressions;
-using System.Reflection.Metadata;
 
 namespace StockApplication.UnitTests.Features.Stocks
 {
@@ -18,9 +18,9 @@ namespace StockApplication.UnitTests.Features.Stocks
     {
         private readonly Mock<IStock> _mockRepo;
         private readonly IMapper _Imapper;
-        private readonly Mock<ILogger<AddCommentHandler>> _mockLogger;
+        private readonly Mock<ILogger<AddStockHandler>> _mockLogger;
         private readonly Mock<IRedisService> _mockRedisService;
-        private readonly AddCommentHandler _handler;
+        private readonly AddStockHandler _handler;
 
         public CreateStockHandlerTests()
         {
@@ -31,7 +31,7 @@ namespace StockApplication.UnitTests.Features.Stocks
                 cfg.AddProfile<MapConfig>();
             });
             _Imapper = config.CreateMapper();
-            _mockLogger = new Mock<ILogger<AddCommentHandler>>();
+            _mockLogger = new Mock<ILogger<AddStockHandler>>();
             _mockRedisService = new Mock<IRedisService>();
             _handler = new AddStockHandler(_mockRepo.Object, _Imapper, _mockLogger.Object, _mockRedisService.Object);
         }

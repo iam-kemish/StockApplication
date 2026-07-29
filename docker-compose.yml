@@ -8,12 +8,16 @@ services:
       dockerfile: StockApplicationApi/Dockerfile
     ports:
       - "8080:8080"
-      - "8081:8081"
+      # - "8081:8081"
     environment:
+      - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - JWT__SigningKey=${JWT_SIGNING_KEY}
       - JWT__Issuer=${JWT_ISSUER}
       - JWT__Audience=${JWT_AUDIENCE}
+      - Admin__Email=${ADMIN_EMAIL}
+      - Admin__Username=${ADMIN_USERNAME}
+      - Admin__Password=${ADMIN_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy   # ← waits for postgres to be TRULY ready
@@ -21,7 +25,7 @@ services:
         condition: service_started
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: stockapp-pgadmin
+    # container_name: stockapp-pgadmin
     ports:
       - "5050:80"
     environment:
@@ -29,7 +33,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
   postgres:
     image: postgres:16-alpine
-    container_name: stockapp-db
+    # container_name: stockapp-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -47,7 +51,7 @@ services:
     
   redis:
     image: redis:7-alpine
-    container_name: stockapp-cache
+    # container_name: stockapp-cache
     # ports:
     #   - "6379:6379"
 

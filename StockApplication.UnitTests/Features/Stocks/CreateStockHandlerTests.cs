@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using StockApplicationApi.Exceptions;
-using StockApplicationApi.Features.Comments.Handlers;
 using StockApplicationApi.Features.Stocks.Commands;
 using StockApplicationApi.Features.Stocks.Handlers;
 using StockApplicationApi.Mapper;

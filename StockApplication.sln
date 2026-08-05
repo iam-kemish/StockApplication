@@ -12,12 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{106D89FD-EA8A-4F5D-8E1B-4DFEE79D9CE8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{4B029469-573F-4CB6-9B6D-18ED4E551FAE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{A932C477-A11D-478B-AAAD-6E895977C0BB}"
-	ProjectSection(SolutionItems) = preProject
-		ci.yml = ci.yml
-	EndProjectSection
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{152F3886-7C64-43A5-8632-6993697587D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,7 +35,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{A932C477-A11D-478B-AAAD-6E895977C0BB} = {106D89FD-EA8A-4F5D-8E1B-4DFEE79D9CE8}
+		{152F3886-7C64-43A5-8632-6993697587D6} = {4B029469-573F-4CB6-9B6D-18ED4E551FAE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {019EF393-B7DC-46C7-8385-E375F35F40E7}

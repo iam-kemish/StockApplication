@@ -27,3 +27,12 @@ jobs:
 
       - name: Run tests
         run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Restore dependencies
+        run: dotnet restore StockApplication.sln
+
+      - name: Build
+        run: dotnet build StockApplication.sln --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test StockApplication.sln --no-build --configuration Release --verbosity normal

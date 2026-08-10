@@ -15,7 +15,7 @@ using static StockApplicationApi.Helpers.RedisCacheStrings;
 namespace StockApplication.UnitTests.Features.Stocks
 {
     public class UpdateStockHandlerTests
-    {
+    { 
         private readonly Mock<IStock> _mockRepo;
         private readonly IMapper _Imapper;
         private readonly UpdateStockHandler _handler;
@@ -47,7 +47,7 @@ namespace StockApplication.UnitTests.Features.Stocks
 
             // ACT
             var ex = await Assert.ThrowsAsync<NotFoundException>(
-                () => _handler.Handle(new UpdateStockCommand(id, stockUpdateDTO, false), default)
+                () => _handler.Handle(new UpdateStockCommand(id, stockUpdateDTO, true), default)
             );
 
             // ASSERT
@@ -87,7 +87,7 @@ namespace StockApplication.UnitTests.Features.Stocks
             _mockRedisService.Setup(r => r.RemoveByPrefixAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
             //_mockMapper.Setup(m => m.Map<StockDTO>(It.IsAny<Stock>()))
             //  .Returns(new StockDTO());
-            await _handler.Handle(new UpdateStockCommand(id, stockUpdateDTO, false), default);
+            await _handler.Handle(new UpdateStockCommand(id, stockUpdateDTO, true), default);
 
             Assert.NotNull(existingStock);
             Assert.Equal("Tesla Updated", existingStock.CompanyName);

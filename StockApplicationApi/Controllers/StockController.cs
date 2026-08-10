@@ -18,9 +18,6 @@ namespace StockApplicationApi.Controllers
     {
         private readonly IMediator _IMediatr;
        
-        private readonly IValidator<StockCreateDTO> _createValidator;
-        private readonly IValidator<StockUpdateDTO> _updateValidator;
-
         public StockController(
            
             IValidator<StockCreateDTO> createValidator,
@@ -29,8 +26,6 @@ namespace StockApplicationApi.Controllers
         {
             _IMediatr = mediator;
          
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
         }
 
         [HttpPost]

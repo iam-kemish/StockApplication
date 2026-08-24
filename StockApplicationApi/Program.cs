@@ -49,8 +49,6 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options => {
     options.Password.RequiredUniqueChars = 1;
 }).AddEntityFrameworkStores<AppDbContext>();
 
-// Authentication
-
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 builder.Services.AddAuthentication(options => {
@@ -132,7 +130,6 @@ var redisConnection = builder.Configuration.GetConnectionString("RedisConnection
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection!));
 builder.Services.AddAutoMapper(typeof(MapConfig));
 builder.Services.AddScoped<IStock, StockRepo>();
-
 builder.Services.AddScoped<IComment, CommentClass>();
 builder.Services.AddScoped<IRefreshToken, RefreshTokenClass>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -149,7 +146,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseRateLimiter();
     app.UseSwaggerUI(options =>
-    {
+    {   
         // Add the forward slash here!
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Stock API v1");
     });

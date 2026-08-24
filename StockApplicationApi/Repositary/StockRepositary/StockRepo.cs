@@ -32,17 +32,18 @@ namespace StockApplicationApi.Repositary.StockRepositary
            await _Db.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Stock>> GetAllStocks(StockQuery stockQuery, CancellationToken cancellationToken= default)
+        public async Task<(IEnumerable<Stock> Stocks, int TotalCount)> GetAllStocks(StockQuery stockQuery, CancellationToken cancellationToken= default)
         {
             var query = _Db.Stocks.Include(p => p.Comments).AsNoTracking().AsQueryable();
             if (!string.IsNullOrWhiteSpace(stockQuery.CompanyName))
             {
-                query = query.Where(u => EF.Functions.Like(u.CompanyName, $"%{stockQuery.CompanyName}%"));
+                query = query.Where(u => EF.Functions.ILike(u.CompanyName, $"%{stockQuery.CompanyName}%"));
             }
             if (!string.IsNullOrWhiteSpace(stockQuery.Symbol))
             {
-                query = query.Where(u => EF.Functions.Like(u.Symbol, $"%{stockQuery.Symbol}%"));
+                query = query.Where(u => EF.Functions.ILike(u.Symbol, $"%{stockQuery.Symbol}%"));
             }
+             var totalCount = await query.CountAsync(cancellationToken);
             if (!string.IsNullOrWhiteSpace(stockQuery.SortBy))
             {
                 if(stockQuery.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
@@ -54,9 +55,11 @@ namespace StockApplicationApi.Repositary.StockRepositary
                     query = stockQuery.IsDescending ? query.OrderByDescending(u => u.MarketCap) : query.OrderBy(u => u.MarketCap);
                 }
             }
+
             var skipNumber = (stockQuery.PageNumber - 1) * stockQuery.PageSize;
 
-            return await query.Skip(skipNumber).Take(stockQuery.PageSize).ToListAsync(cancellationToken);
+            var stocks = await query.Skip(skipNumber).Take(stockQuery.PageSize).ToListAsync(cancellationToken);
+            return (stocks, totalCount);
         }
 
         public Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null, CancellationToken cancellationToken = default, bool tracking = false)

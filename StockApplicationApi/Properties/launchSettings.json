@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "http": {
       "commandName": "Project",
@@ -16,16 +17,18 @@
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7268;http://localhost:5147"
     },
-    "Container (Dockerfile)": {
+    "Docker": {
       "commandName": "Docker",
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://+:443;http://+:80",
+        "ASPNETCORE_Kestrel__Certificates__Default__Password": "YourSecurePassword123!",
+        "ASPNETCORE_Kestrel__Certificates__Default__Path": "/root/.aspnet/https/aspnetapp.pfx"
       },
       "publishAllPorts": true,
       "useSSL": true
     }
-  },
-  "$schema": "https://json.schemastore.org/launchsettings.json"
+  }
 }

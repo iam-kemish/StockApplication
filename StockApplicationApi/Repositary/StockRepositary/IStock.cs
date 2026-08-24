@@ -9,7 +9,7 @@ namespace StockApplicationApi.Repositary.StockRepositary
         Task AddStock(Stock stock, CancellationToken cancellationToken = default);
         Task UpdateStock(Stock stock, CancellationToken cancellationToken = default);
         Task DeleteStock(Stock stock, CancellationToken cancellationToken = default);
-        Task<IEnumerable<Stock>> GetAllStocks(StockQuery stockQuery, CancellationToken cancellationToken = default);
+        Task<(IEnumerable<Stock> Stocks, int TotalCount)> GetAllStocks(StockQuery stockQuery, CancellationToken cancellationToken = default);
         Task<Stock?> GetStock(Expression<Func<Stock, bool>>? filter = null, CancellationToken cancellationToken = default, bool tracking = false);
         Task<bool> StockExists(int id, CancellationToken cancellationToken = default);
     }

@@ -14,9 +14,9 @@ namespace StockApplicationApi.Models.DTOs.StockDTOs
        
         public decimal LastDiv { get; set; }
 
-        public string Industry { get; set; } = string.Empty;
+        public string Industry { get; set; } = string.Empty;  
         public long MarketCap { get; set; }
-
+                                            
         public IEnumerable<Comment> Comments { get; set; } = new List<Comment>();
     }
 }

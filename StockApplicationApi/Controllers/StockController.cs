@@ -113,7 +113,6 @@ namespace StockApplicationApi.Controllers
               statusCode = HttpStatusCode.NoContent,
                Message = "Stock deleted successfully"
          }
-               
             );
         }
     }

@@ -1,3 +1,8 @@
+**![CI](https://github.com/iam-kemish/StockApplication/actions/workflows/ci.yml/badge.svg)**
+
+**## CI/CD
+GitHub Actions automatically builds and runs all unit tests on every push to `master`.**
+
 # StockApplicationApi 
 A stock discussion API where users can post comments about stocks.
 
@@ -20,15 +25,18 @@ A stock discussion API where users can post comments about stocks.
 * **xUnit + Moq** - Unit tests specifically for the service layer
 * **FluentValidation** - Validates incoming HTTP requests automatically
 
-### How it's built (layers)
-Controller →   Service    →      Repository
-↓              ↓                 ↓
-DTOs       Business logic      Database
+## How it's built (architecture)
 
-* **Controllers:** Just receive requests, call services, and return responses.
-* **Services:** All the core business logic lives here (checking if a stock exists, checking if a user actually owns the comment they are trying to edit, etc.).
-* **Repositories:** Handles raw database operations (add, update, delete, find).
-* **DTOs:** Data Transfer Objects. What goes in and out of the API to the user, completely hiding internal database models.
+**CQRS pattern using MediatR:**
+
+Controller → MediatR → Command/Query Handler → Repository/DbContext
+                              ↓
+                        Business logic lives here
+
+- **Controllers:** Receive requests, dispatch commands/queries via MediatR, return responses
+- **Commands:** Represent an intent to change state (CreateStock, UpdateComment, etc.)
+- **Queries:** Represent a request for data (GetStockById, GetComments, etc.)
+- **Handlers:** Contain the actual business logic for each command/query
 
 ### Security Features
 * **Refresh token rotation with breach detection**
@@ -66,10 +74,13 @@ DTOs       Business logic      Database
 | **POST** | `/api/comment/{stockId}` | Add a comment (Requires authentication + **Rate-Limited**) |
 | **PUT** | `/api/comment/{commentId}` | Edit your own comment |
 
-### How to run this locally
+## How to run this locally
 
-1. Make sure you have **Docker Desktop** installed and running on your machine.
-2. Clone this project repository and open your terminal in the root directory.
-3. Run the following command to spin up the API, database, and Redis instances automatically:
-   ```bash
-   docker compose up --build -d
+1. Make sure Docker Desktop is installed and running.
+2. Clone this repository.
+3. Copy `.env.example` to `.env`:
+4. Open `.env` and fill in your own values for each variable (database password, JWT signing key, admin credentials, etc.).
+   **Note:** `JWT_SIGNING_KEY` must be at least 32 characters long. `ADMIN_EMAIL` / `ADMIN_USERNAME` / `ADMIN_PASSWORD` are used to seed a default Admin user on      first run.
+5. Run:
+6. API: http://localhost:8080/swagger
+7. pgAdmin: http://localhost:5050

@@ -143,14 +143,16 @@ app.UseMiddleware<GlobalException>();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    //app.UseSwagger();
     app.UseRateLimiter();
-    app.UseSwaggerUI(options =>
-    {   
-        // Add the forward slash here!
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Stock API v1");
-    });
+  
 }
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Stock Application API v1");
+    c.RoutePrefix = "swagger"; 
+});
 using (var scope = app.Services.CreateScope())
 {
 

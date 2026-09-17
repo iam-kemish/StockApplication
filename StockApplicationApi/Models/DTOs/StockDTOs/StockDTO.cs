@@ -4,19 +4,18 @@ namespace StockApplicationApi.Models.DTOs.StockDTOs
 {
     public class StockDTO
     {
-        public int Id { get; set; }
-        public string Symbol { get; set; } = string.Empty;
-        public string CompanyName { get; set; } = string.Empty;
+        public int id { get; set; }
+        public string symbol { get; set; } = string.Empty;
+        public string companyName { get; set; } = string.Empty;
+ 
+        public decimal purchase { get; set; }
 
        
-        public decimal Purchase { get; set; }
+        public decimal lastDiv { get; set; }
 
-       
-        public decimal LastDiv { get; set; }
-
-        public string Industry { get; set; } = string.Empty;  
-        public long MarketCap { get; set; }
+        public string industry { get; set; } = string.Empty;  
+        public long marketCap { get; set; }
                                             
-        public IEnumerable<Comment> Comments { get; set; } = new List<Comment>();
+        public IEnumerable<Comment> comments { get; set; } = new List<Comment>();
     }
 }

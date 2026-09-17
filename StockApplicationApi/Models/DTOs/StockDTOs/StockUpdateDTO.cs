@@ -3,14 +3,14 @@
     public class StockUpdateDTO
     {
        
-        public string Symbol { get; set; } = string.Empty;
-        public string CompanyName { get; set; } = string.Empty;
+        public string symbol { get; set; } = string.Empty;
+        public string companyName { get; set; } = string.Empty;
 
-        public decimal Purchase { get; set; }
+        public decimal purchase { get; set; }
 
-        public decimal LastDiv { get; set; }
+        public decimal lastDiv { get; set; }
 
-        public string Industry { get; set; } = string.Empty;
-        public long MarketCap { get; set; }
+        public string industry { get; set; } = string.Empty;
+        public long marketCap { get; set; }
     }
 }

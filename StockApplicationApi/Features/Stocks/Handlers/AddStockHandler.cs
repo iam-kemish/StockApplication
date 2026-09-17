@@ -31,18 +31,18 @@ namespace StockApplicationApi.Features.Stocks.Handlers
                 throw new UnAuthorizedException("Access Denied: You do not have the Admin role required for this action.");
             }
             var existing = await _IStock.GetStock(u =>
-                u.CompanyName.ToLower() == request.stock.CompanyName.ToLower() ||
-                u.Symbol.ToLower() == request.stock.Symbol.ToLower());
+                u.CompanyName.ToLower() == request.stock.companyName.ToLower() ||
+                u.Symbol.ToLower() == request.stock.symbol.ToLower());
 
             if (existing != null)
             {
 
                 string conflictDetail = "";
 
-                if (existing.CompanyName.Equals(request.stock.CompanyName, StringComparison.OrdinalIgnoreCase))
-                    conflictDetail = $"Company Name '{request.stock.CompanyName}'";
-                else if (existing.Symbol.Equals(request.stock.Symbol, StringComparison.OrdinalIgnoreCase))
-                    conflictDetail = $"Symbol '{request.stock.Symbol}'";
+                if (existing.CompanyName.Equals(request.stock.companyName, StringComparison.OrdinalIgnoreCase))
+                    conflictDetail = $"Company Name '{request.stock.companyName}'";
+                else if (existing.Symbol.Equals(request.stock.symbol, StringComparison.OrdinalIgnoreCase))
+                    conflictDetail = $"Symbol '{request.stock.symbol}'";
 
                 _logger.LogWarning("Conflict detected: {ConflictDetail}", conflictDetail);
 
@@ -52,7 +52,7 @@ namespace StockApplicationApi.Features.Stocks.Handlers
             var createdStock = _IMapper.Map<Stock>(request.stock);
             await _IStock.AddStock(createdStock);
             await _cache.RemoveByPrefixAsync(CacheKeys.StockList);
-            _logger.LogInformation("Stock created and removed cache successfully: {CompanyName}", request.stock.CompanyName);
+            _logger.LogInformation("Stock created and removed cache successfully: {CompanyName}", request.stock.companyName);
             return _IMapper.Map<StockDTO>(createdStock);
         }
     }

@@ -47,12 +47,12 @@ namespace StockApplicationApi.Features.Stocks.Handlers
             {
                 Items = resultedStocks.ToList(),
                 TotalCount = totalCount,
-                PageNumber = request.StockQuery.PageNumber,
-                PageSize = request.StockQuery.PageSize
+                PageNumber = request.StockQuery.pageNumber,
+                PageSize = request.StockQuery.pageSize
             };
 
             _logger.LogInformation("Step 6: caching");
-            await _cache.SetDataAsync(GetCachekey, result, TimeSpan.FromMinutes(5));
+            await _cache.SetDataAsync(GetCachekey, result, TimeSpan.FromSeconds(10));
 
             _logger.LogInformation("Step 7: returning");
             return result;

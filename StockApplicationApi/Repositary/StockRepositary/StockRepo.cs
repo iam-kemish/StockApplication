@@ -35,30 +35,30 @@ namespace StockApplicationApi.Repositary.StockRepositary
         public async Task<(IEnumerable<Stock> Stocks, int TotalCount)> GetAllStocks(StockQuery stockQuery, CancellationToken cancellationToken= default)
         {
             var query = _Db.Stocks.Include(p => p.Comments).AsNoTracking().AsQueryable();
-            if (!string.IsNullOrWhiteSpace(stockQuery.CompanyName))
+            if (!string.IsNullOrWhiteSpace(stockQuery.companyName))
             {
-                query = query.Where(u => EF.Functions.ILike(u.CompanyName, $"%{stockQuery.CompanyName}%"));
+                query = query.Where(u => EF.Functions.ILike(u.CompanyName, $"%{stockQuery.companyName}%"));
             }
-            if (!string.IsNullOrWhiteSpace(stockQuery.Symbol))
+            if (!string.IsNullOrWhiteSpace(stockQuery.symbol))
             {
-                query = query.Where(u => EF.Functions.ILike(u.Symbol, $"%{stockQuery.Symbol}%"));
+                query = query.Where(u => EF.Functions.ILike(u.Symbol, $"%{stockQuery.symbol}%"));
             }
              var totalCount = await query.CountAsync(cancellationToken);
-            if (!string.IsNullOrWhiteSpace(stockQuery.SortBy))
+            if (!string.IsNullOrWhiteSpace(stockQuery.sortBy))
             {
-                if(stockQuery.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                if(stockQuery.sortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
                 {
-                    query = stockQuery.IsDescending ? query.OrderByDescending(u=>u.Symbol) : query.OrderBy(u=>u.Symbol);
+                    query = stockQuery.isDescending ? query.OrderByDescending(u=>u.Symbol) : query.OrderBy(u=>u.Symbol);
                 }
-                if(stockQuery.SortBy.Equals("Marketcap", StringComparison.OrdinalIgnoreCase))
+                if(stockQuery.sortBy.Equals("Marketcap", StringComparison.OrdinalIgnoreCase))
                 {
-                    query = stockQuery.IsDescending ? query.OrderByDescending(u => u.MarketCap) : query.OrderBy(u => u.MarketCap);
+                    query = stockQuery.isDescending ? query.OrderByDescending(u => u.MarketCap) : query.OrderBy(u => u.MarketCap);
                 }
             }
 
-            var skipNumber = (stockQuery.PageNumber - 1) * stockQuery.PageSize;
+            var skipNumber = (stockQuery.pageNumber - 1) * stockQuery.pageSize;
 
-            var stocks = await query.Skip(skipNumber).Take(stockQuery.PageSize).ToListAsync(cancellationToken);
+            var stocks = await query.Skip(skipNumber).Take(stockQuery.pageSize).ToListAsync(cancellationToken);
             return (stocks, totalCount);
         }
 

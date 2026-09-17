@@ -30,6 +30,11 @@ namespace StockApplicationApi.Seeders
             var adminEmail = _config["Admin:Email"];
             var username = _config["Admin:Username"]; 
             var password = _config["Admin:Password"];
+            if(string.IsNullOrEmpty(adminEmail) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                _logger.LogWarning("Admin credentials are not properly configured in appsettings.json.");
+                return;
+            }
             var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
 
             if (existingAdmin == null)

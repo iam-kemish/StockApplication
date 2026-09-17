@@ -12,7 +12,7 @@
             public static string StockDetail(int id) => $"{"stocks:"}{id}";
 
             public static string GetStockListKey(StockQuery q) =>
-                $"{StockList}p{q.PageNumber}_s{q.PageSize}_{q.Symbol}";
+                $"{StockList}p{q.pageNumber}_s{q.pageSize}_{q.symbol}";
         }
     }
 }

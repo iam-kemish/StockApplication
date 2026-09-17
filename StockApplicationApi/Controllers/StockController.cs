@@ -41,7 +41,7 @@ namespace StockApplicationApi.Controllers
 
             return CreatedAtAction(
                 nameof(GetById),
-                new { id = stock.Id },   
+                new { id = stock.id },   
                 new APIResponse
                 {
                     IsSuccess = true,
@@ -53,7 +53,7 @@ namespace StockApplicationApi.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
+     
         public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
             

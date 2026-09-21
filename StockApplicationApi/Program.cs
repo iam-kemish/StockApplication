@@ -145,7 +145,8 @@ if (app.Environment.IsDevelopment())
 {
     //app.UseSwagger();
     app.UseRateLimiter();
-  
+    app.UseHttpsRedirection();
+
 }
 app.UseSwagger();
 app.UseSwaggerUI(c =>

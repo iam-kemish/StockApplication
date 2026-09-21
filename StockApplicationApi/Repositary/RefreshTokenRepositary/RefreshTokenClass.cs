@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using StockApplicationApi.Database;
 using StockApplicationApi.Models.RefreshTokens;
+using StockApplicationApi.Database;
 
 namespace StockApplicationApi.Repositary.RefreshTokenRepositary
 {
@@ -17,6 +17,16 @@ namespace StockApplicationApi.Repositary.RefreshTokenRepositary
         {
          return await _Db.RefreshTokens.Include(u=>u.AppUser).FirstOrDefaultAsync(u => u.Token == token);
         }
+
+        public async Task<int> MarkUsedIfUnused(string token, DateTime usedAt)
+        {
+            return  await _Db.RefreshTokens.Where(r => r.Token == token && !r.IsUsed)
+                .ExecuteUpdateAsync(s =>
+                s.SetProperty(r => r.IsUsed, true)
+                .SetProperty(r => r.UsedAt, usedAt));
+
+        }
+        
 
         public async Task RevokeAllTokens(string userId)
         {

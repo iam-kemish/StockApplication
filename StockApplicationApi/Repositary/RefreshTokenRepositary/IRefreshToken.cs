@@ -9,6 +9,7 @@ namespace StockApplicationApi.Repositary.RefreshTokenRepositary
         Task<RefreshToken?> GetRefreshToken(string token);
         Task  UpdateRefreshToken(RefreshToken refreshToken);
 
+        Task<int> MarkUsedIfUnused(string userId, DateTime usedAt);
         Task RevokeAllTokens(string userId);
 
     }

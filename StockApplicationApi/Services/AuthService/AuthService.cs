@@ -138,26 +138,7 @@ namespace StockApplicationApi.Services.AuthService
            
             var storedToken = await _IRefresh.GetRefreshToken(refreshToken);
 
-            if (storedToken == null)
-                throw new NotFoundException("Refresh Token not found.");
-            // Instead of immediate revocation on IsUsed:
-            if (storedToken.IsUsed )
-            {
-                var timeSinceFirstUse = DateTime.UtcNow - storedToken.UsedAt;
-
-                if (timeSinceFirstUse < TimeSpan.FromSeconds(5))
-                {
-                    // Almost certainly a network retry - just reject this request
-                    // but DON'T revoke anything
-                    throw new UnAuthorizedException("Token already used recently - retry with new token");
-                }
-                else
-                {
-                    // More than 5 seconds later - likely theft
-                    await _IRefresh.RevokeAllTokens(storedToken.AppUserId);
-                    throw new UnAuthorizedException("Suspicious activity detected");
-                }
-            }
+          
             if (storedToken.AppUserId != userId) 
                 throw new UnAuthorizedException("Token user mismatch");
 
@@ -168,9 +149,34 @@ namespace StockApplicationApi.Services.AuthService
                 throw new UnAuthorizedException("Refresh token has expired.");
 
             // Mark as used (rotation)
-            storedToken.IsUsed = true;
-            storedToken.UsedAt = DateTime.UtcNow;
-            await _IRefresh.UpdateRefreshToken(storedToken);
+            var rowsAffected = await _IRefresh.MarkUsedIfUnused(
+       refreshToken,
+       DateTime.UtcNow);
+
+            if (rowsAffected == 0)
+            {
+                // We lost the race (or it was genuinely already used earlier).
+                // Re-fetch to get the current UsedAt so we can run your
+                // existing retry-vs-theft timing logic.
+                var current = await _IRefresh.GetRefreshToken(refreshToken);
+
+                if (current == null)
+                    throw new NotFoundException("Refresh Token not found.");
+
+                var timeSinceFirstUse = DateTime.UtcNow - current.UsedAt;
+
+                if (timeSinceFirstUse < TimeSpan.FromSeconds(5))
+                {
+                    // Near-simultaneous retry (e.g. duplicate frontend call) — reject, don't revoke
+                    throw new UnAuthorizedException("Token already used recently - retry with new token");
+                }
+                else
+                {
+                    // Used a while ago and being reused now — likely theft
+                    await _IRefresh.RevokeAllTokens(current.AppUserId);
+                    throw new UnAuthorizedException("Suspicious activity detected");
+                }
+            }
 
             // Create new tokens
             var user = await _userManager.FindByIdAsync(storedToken.AppUserId);

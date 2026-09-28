@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using StockApplicationApi.Models.DTOs.CommentDTOs;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StockApplicationApi.Models.DTOs.StockDTOs
 {
@@ -16,6 +17,6 @@ namespace StockApplicationApi.Models.DTOs.StockDTOs
         public string industry { get; set; } = string.Empty;  
         public long marketCap { get; set; }
                                             
-        public IEnumerable<Comment> comments { get; set; } = new List<Comment>();
+        public IEnumerable<CommentDto> comments { get; set; } = new List<CommentDto>();
     }
 }

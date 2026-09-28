@@ -20,14 +20,12 @@ namespace StockApplicationApi.Repositary.RefreshTokenRepositary
 
         public async Task<int> MarkUsedIfUnused(string token, DateTime usedAt)
         {
-            return  await _Db.RefreshTokens.Where(r => r.Token == token && !r.IsUsed)
+           return  await _Db.RefreshTokens.Where(r => r.Token == token && !r.IsUsed)
                 .ExecuteUpdateAsync(s =>
                 s.SetProperty(r => r.IsUsed, true)
                 .SetProperty(r => r.UsedAt, usedAt));
 
-        }
-        
-
+        }        
         public async Task RevokeAllTokens(string userId)
         {
            await _Db.RefreshTokens.Where(r => r.AppUserId == userId)

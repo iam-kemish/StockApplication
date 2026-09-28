@@ -7,7 +7,7 @@ namespace StockApplicationApi.Models
     {
         public bool IsSuccess { get; set; } = true;
 
-        [JsonPropertyName("statusCode")]
+        [JsonPropertyName("statusCode")]    
         public HttpStatusCode statusCode { get; set; }
         public object Result { get; set; }
         public string? Message { get; set; }   

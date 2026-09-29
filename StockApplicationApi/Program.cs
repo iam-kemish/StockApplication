@@ -156,11 +156,23 @@ app.UseSwaggerUI(c =>
 });
 using (var scope = app.Services.CreateScope())
 {
-
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-    var seeder = scope.ServiceProvider.GetRequiredService<IdentitySeeder>();
-    await seeder.SeedAdminAsync();
+    try
+    {
+        logger.LogInformation("Applying migrations...");
+        await db.Database.MigrateAsync();
+        logger.LogInformation("Migrations applied successfully.");
+    }
+    catch
+    {
+        logger.LogError("An error occurred while applying migrations.");
+        throw;
+    }
+
+    var identitySeeder = scope.ServiceProvider.GetRequiredService<IdentitySeeder>();
+    await identitySeeder.SeedAdminAsync();
+    await DataSeeder.SeedCommentsAsync(db);
 }
 
 app.UseCors("AllowAll");

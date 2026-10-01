@@ -1,7 +1,9 @@
-**![CI](https://github.com/iam-kemish/StockApplication/actions/workflows/ci.yml/badge.svg)**
-
-**## CI/CD
-GitHub Actions automatically builds and runs all unit tests on every push to `master`.**
+![CI](https://github.com/iam-kemish/StockApplication/actions/workflows/ci.yml/badge.svg)
+**Live API:** https://stockapplication-wxg7.onrender.com
+> Hosted on Render's free tier. After idle time the first request can take up to a minute while the service wakes up.
+## CI/CD
+- On every push to `master`, GitHub Actions builds the project and runs the unit tests.
+- Deployment: Render is synced with master branch of the project on Github so it auto deploys on every Github changes.
 
 # StockApplicationApi 
 A stock discussion API where users can post comments about stocks.
@@ -12,12 +14,12 @@ A stock discussion API where users can post comments about stocks.
 * Post comments about specific stocks.
 * Each comment is tied to a user (no anonymous posting).
 * Users are allowed limited comments for a certain time (Rate Limited).
-* Users can only edit or delete their **OWN** comments.
+* Users can only edit or delete their own comments.
 * Server-side Pagination & Sorting on stocks and comments so the API doesn't choke on big data.
 
 ### Technology used 
 * **.NET 9** - Core framework
-* **Entity Framework Core** - Talks to **PostgreSQL** (or SQL Server, pick your actual DB here!)
+* **Entity Framework Core** - Talks to **PostgreSQL** 
 * **Docker & Docker Compose** - Runs the app, Redis, and database containers seamlessly
 * **Redis Caching** - Keeps things fast so I don't hit the DB for every request
 * **ASP.NET Core Identity** - Handles user registration and logins
@@ -28,7 +30,7 @@ A stock discussion API where users can post comments about stocks.
 ## How it's built (architecture)
 
 **CQRS pattern using MediatR:**
-
+(Note- I used CQRS in product models like stocks and comments because i might update many business logics related to it later, so read and write together could be more messier, whereas i used regular N-tier for Authentication because it mostly have straightforward service operations).
 Controller → MediatR → Command/Query Handler → Repository/DbContext
                               ↓
                         Business logic lives here
@@ -42,16 +44,16 @@ Controller → MediatR → Command/Query Handler → Repository/DbContext
 * **Refresh token rotation with breach detection**
   * When you request a new access token using a refresh token, the old refresh token gets marked as "used" immediately.
   * You receive a brand new refresh token back.
-  * If an attacker tries to replay and use that **SAME** old refresh token again, the system automatically detects it and instantly revokes **ALL** active tokens for that user.
+  * If an attacker tries to replay and use that same old refresh token again, the system automatically detects it and instantly revokes all active tokens for that user.
 * **Validation at 3 levels**
   1. **FluentValidation:** Checks basic request data formats (e.g., "Stock symbol can't be empty").
-  2. **Service layer custom checks:** Enforces business rules (e.g., "Can't comment on non-existent stock").
+  2. **handler/Service layer(for Auths) custom checks:** Enforces business rules (e.g., "Can't comment on non-existent stock").
   3. **Global exception handler:** A middleware that catches anything unexpected (like DB connection failures) so the app doesn't leak raw stack traces.
 
 ### Redis Caching Strategy
 * **When you hit `GET /api/stocks` or `/api/comments`:**
-  * Checks Redis first. If the data exists, it returns straight from the cache (~5ms).
-  * If it's a cache miss, it hits the database (~50ms), returns the data, and stores the result inside Redis for 10 minutes.
+  * Checks Redis first. If the data exists, it returns straight from the cache.
+  * If it's a cache miss, it hits the database, returns the data, and stores the result inside Redis for 10 minutes.
 * **When you hit a write command (`POST`/`PUT`/`DELETE`):**
   * It updates the database first, then deletes the relevant cache keys by prefix so the very next `GET` request is forced to pull fresh data from the DB.
 
@@ -78,9 +80,12 @@ Controller → MediatR → Command/Query Handler → Repository/DbContext
 
 1. Make sure Docker Desktop is installed and running.
 2. Clone this repository.
-3. Copy `.env.example` to `.env`:
+3. Copy `.env.example` to `.env`.
 4. Open `.env` and fill in your own values for each variable (database password, JWT signing key, admin credentials, etc.).
    **Note:** `JWT_SIGNING_KEY` must be at least 32 characters long. `ADMIN_EMAIL` / `ADMIN_USERNAME` / `ADMIN_PASSWORD` are used to seed a default Admin user on      first run.
-5. Run:
-6. API: http://localhost:8080/swagger
-7. pgAdmin: http://localhost:5050
+5. Run: docker compose up -d --build
+
+## Deployment
+The Dockerized app runs on Render as separate services: the API, PostgreSQL and Redis. Configuration comes from environment variables. On startup, IdentitySeeder creates the Admin role and user if they don't exist.
+7. API: http://localhost:8080/swagger
+8. pgAdmin: http://localhost:5050
